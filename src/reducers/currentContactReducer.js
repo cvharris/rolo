@@ -1,16 +1,18 @@
-// State
+// Initial State
 const initialState = {
-  contacts: []
+  name: '',
+  number: ''
 }
 
-// Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'ADD_CONTACT':
+    case 'UPDATE_CONTACT_NAME':
       return {
         ...state,
-        contacts: state.contacts = [...state.contacts, action.payload]
+        name: action.payload
       }
+    case 'ADD_CONTACT':
+      return initialState
     default:
       return state
   }
