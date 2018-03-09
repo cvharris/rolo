@@ -1,21 +1,20 @@
 import contactList from '../reducers/contactListReducer'
 import currentContact from '../reducers/currentContactReducer'
 import { combineReducers, createStore } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import throttle from 'lodash/throttle'
-import { saveState } from './storage'
+import { saveState } from './localStorage'
 
 const configureStore = (persistedState) => {
   const store = createStore(combineReducers({
     contactList,
     currentContact
-  }), {
-      contactList: {
-        contacts: persistedState,
-      },
-    })
+  }), persistedState, composeWithDevTools())
 
   store.subscribe(throttle(() => {
-    saveState(store.getState().contactList.contacts)
+    saveState({
+      contactList: store.getState().contactList
+    })
   }, 1000))
 
   return store

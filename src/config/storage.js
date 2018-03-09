@@ -2,7 +2,7 @@ import firebase from './firebase'
 
 export const loadState = () => {
   firebase.database().ref().child('contacts').on('value', (snapshot) => {
-    return snapshot.toJSON()
+    return snapshot.val()
   })
 }
 

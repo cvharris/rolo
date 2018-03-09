@@ -2,6 +2,12 @@
   "name": "rolo-web",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.4",
     "@fortawesome/fontawesome-free-solid": "^5.0.8",
@@ -14,13 +20,8 @@
     "react-scripts": "1.1.1",
     "redux": "^3.7.2",
     "tachyons": "^4.9.1",
-    "tachyons-cli": "^1.2.0"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "tachyons-cli": "^1.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@firebase/app-types": "^0.1.2",
@@ -30,6 +31,10 @@
     "@types/react-redux": "^5.0.15",
     "@types/react-router-dom": "^4.2.4",
     "@types/redux": "^3.6.0",
-    "firebase": "^4.10.1"
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "firebase": "^4.10.1",
+    "react-addons-test-utils": "^15.6.2",
+    "redux-devtools-extension": "^2.13.2"
   }
 }

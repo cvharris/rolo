@@ -1,15 +1,23 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ContactsList from '../components/ContactsList'
-import ContactForm from '../components/ContactForm'
-import { updateContactName, addContact, removeContact } from '../actions/currentContactActions';
+import { removeContact } from '../actions/currentContactActions';
+import { Route, } from 'react-router'
+import { withRouter } from 'react-router-dom'
+import AddContact from './AddContact';
+import EditContact from './EditContact';
+import Sidebar from './Sidebar';
 
 class Rolodex extends Component {
   render() {
     return (
       <div>
-        <ContactForm newContact={this.props.newContact} onNameUpdate={this.props.updateCurrentContactName} onContactSubmit={this.props.addContact} />
-        <ContactsList contacts={this.props.contacts} onRemoveContact={this.props.removeContact} />
+        <Sidebar />
+        <div>
+          <Route exact path="/" render={() => <ContactsList contacts={this.props.contacts} onRemoveContact={this.props.removeContact} />} />
+          <Route path="/new-contact" component={AddContact} />
+          <Route path="/edit-contact/:contactName" component={EditContact} />
+        </div>
       </div>
     )
   }
@@ -17,19 +25,13 @@ class Rolodex extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateCurrentContactName: (name) => {
-      dispatch(updateContactName(name))
-    },
-    addContact: (newContact) => {
-      dispatch(addContact(newContact))
-    },
     removeContact: (contact) => {
       dispatch(removeContact(contact))
     }
   }
 }
 
-export default connect(state => ({
-  contacts: state.contactList.contacts,
-  newContact: state.currentContact
-}), mapDispatchToProps)(Rolodex)
+// @ts-ignore
+export default withRouter(connect(state => ({
+  contacts: state.contactList
+}), mapDispatchToProps)(Rolodex))

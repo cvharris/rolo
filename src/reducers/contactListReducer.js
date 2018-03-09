@@ -1,21 +1,15 @@
 // State
-const initialState = {
-  contacts: []
-}
+export const initialState = []
 
 // Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'ADD_CONTACT':
-      return {
-        ...state,
-        contacts: state.contacts = [...state.contacts, action.payload]
-      }
+      return [...state, action.payload]
     case 'REMOVE_CONTACT':
-      return {
-        ...state,
-        contacts: state.contacts.filter(contact => contact.name !== action.payload.name)
-      }
+      return state.filter(contact => contact.name !== action.payload.name)
+    case 'UPDATE_CONTACT':
+      return state.map(contact => contact.name === action.payload.name ? action.payload : contact)
     default:
       return state
   }

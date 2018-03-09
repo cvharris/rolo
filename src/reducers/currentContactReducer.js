@@ -1,8 +1,7 @@
+import Contact from "../lib/Contact";
+
 // Initial State
-const initialState = {
-  name: '',
-  number: ''
-}
+const initialState = new Contact({})
 
 export default (state = initialState, action) => {
   switch (action.type) {
