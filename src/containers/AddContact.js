@@ -12,15 +12,7 @@ class AddContact extends Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addContact: (newContact) => {
-      dispatch(addContact(newContact))
-    }
-  }
-}
-
 // @ts-ignore
 export default withRouter(connect((state) => ({
   newContact: state.currentContact
-}), mapDispatchToProps)(AddContact))
+}), { addContact: addContact })(AddContact))
