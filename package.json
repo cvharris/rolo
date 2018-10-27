@@ -1,40 +1,60 @@
 {
-  "name": "rolo-web",
+  "name": "rolo",
   "version": "0.1.0",
   "private": true,
+  "dependencies": {
+    "firebase": "^5.5.6",
+    "lodash": "^4.17.11",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-redux": "^5.1.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "2.0.5",
+    "redux": "^4.0.1",
+    "tachyons": "^4.11.1",
+    "uuid": "^3.3.2"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "dependencies": {
-    "@fortawesome/fontawesome": "^1.1.4",
-    "@fortawesome/fontawesome-free-solid": "^5.0.8",
-    "@fortawesome/react-fontawesome": "^0.0.17",
-    "lodash": "^4.17.5",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-redux": "^5.0.7",
-    "react-router-dom": "^4.2.2",
-    "react-scripts": "1.1.1",
-    "redux": "^3.7.2",
-    "tachyons": "^4.9.1",
-    "tachyons-cli": "^1.2.0",
-    "uuid": "^3.2.1"
-  },
   "devDependencies": {
-    "@firebase/app-types": "^0.1.2",
-    "@types/lodash": "^4.14.104",
-    "@types/react": "^16.0.38",
-    "@types/react-native": "^0.52.12",
-    "@types/react-redux": "^5.0.15",
-    "@types/react-router-dom": "^4.2.4",
-    "@types/redux": "^3.6.0",
-    "enzyme": "^3.3.0",
-    "enzyme-adapter-react-16": "^1.1.1",
-    "firebase": "^4.10.1",
-    "react-addons-test-utils": "^15.6.2",
-    "redux-devtools-extension": "^2.13.2"
-  }
+    "@fortawesome/fontawesome-pro": "^5.4.2",
+    "enzyme": "^3.7.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "prettier": "^1.14.3",
+    "redux-devtools-extension": "^2.13.5"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "plugin:prettier/recommended"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "src/**/*"
+        ],
+        "rules": {
+          "no-var": [
+            "error"
+          ],
+          "radix": [
+            "error"
+          ],
+          "prettier/prettier": "warn",
+          "react/jsx-max-props-per-line": "off"
+        }
+      }
+    ]
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

@@ -1,19 +1,22 @@
 import React, { Component } from 'react'
-import firebase from './config/firebase'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
+import firebase from './config/firebase'
+import { loadState } from './config/localStorage'
 import configureStore from './config/store'
 import Rolodex from './containers/Rolodex'
-import { loadState } from './config/localStorage';
 
 export default class RoloApp extends Component {
   constructor(props) {
     super(props)
     this.state = {
       isStoreLoading: true,
-      store: null,
+      store: null
     }
-    this.stateRef = firebase.database().ref().child('contacts')
+    this.stateRef = firebase
+      .database()
+      .ref()
+      .child('contacts')
   }
 
   componentWillMount() {
@@ -21,12 +24,12 @@ export default class RoloApp extends Component {
     const persistedState = loadState()
     this.setState({
       store: configureStore(persistedState),
-      isStoreLoading: false,
+      isStoreLoading: false
     })
   }
 
   listenForState(stateRef) {
-    stateRef.on('value', (snapshot) => {
+    stateRef.on('value', snapshot => {
       if (snapshot) {
         this.setState({
           store: configureStore(snapshot.val() ? snapshot.val() : []),
@@ -39,9 +42,7 @@ export default class RoloApp extends Component {
 
   render() {
     if (this.state.isStoreLoading) {
-      return (
-        <div>Loading...</div>
-      )
+      return <div>Loading...</div>
     }
 
     return (
