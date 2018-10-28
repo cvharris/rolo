@@ -1,18 +1,33 @@
-import React, { Component } from 'react';
-import ContactForm from '../components/ContactForm';
-import { connect } from 'react-redux';
-import { addContact } from '../actions/currentContactActions';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import { addContact } from '../actions/contactListActions'
+import ContactForm from '../components/ContactForm'
 
 class AddContact extends Component {
   render() {
     return (
-      <ContactForm contact={this.props.newContact} onNameUpdate={this.props.updateCurrentContactName} onContactSubmit={this.props.addContact} />
-    );
+      <ContactForm
+        contact={this.props.newContact}
+        onNameUpdate={this.props.updateCurrentContactName}
+        onContactSubmit={this.props.addContact}
+      />
+    )
   }
 }
 
-// @ts-ignore
-export default withRouter(connect((state) => ({
-  newContact: state.currentContact
-}), { addContact: addContact })(AddContact))
+const mapDispatchToProps = (dispatch, props) => ({
+  addContact: newContact => {
+    props.history.push('/')
+    dispatch(addContact(newContact))
+  }
+})
+
+export default withRouter(
+  connect(
+    state => ({
+      newContact: state.currentContact
+    }),
+    mapDispatchToProps
+  )(AddContact)
+)

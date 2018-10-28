@@ -1,13 +1,11 @@
 import { v4 } from 'uuid'
 
 export default class Contact {
-
-  constructor({
-    id = v4(),
-    firstName = '',
-  }) {
+  constructor({ id = v4(), firstName = '', lastName = '', company = '' }) {
     this.id = id
     this.firstName = firstName
+    this.lastName = lastName
+    this.company = company
   }
 }
 
@@ -15,9 +13,7 @@ export default class Contact {
   this.phoneNumbers = phoneNumbers
   this.emails = emails
   this.addresses = addresses
-  this.lastName = lastName
   this.nickname = nickname
-  this.company = company
   this.birthday = birthday
   this.middleName = middleName
   this.maidenName = maidenName
