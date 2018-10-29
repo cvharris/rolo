@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Route } from 'react-router'
 import { withRouter } from 'react-router-dom'
-import { removeContact } from '../actions/contactListActions'
+import { removeContact } from '../actions/contactsActions'
 import ContactsList from '../components/ContactsList'
 import AddContact from './AddContact'
 import EditContact from './EditContact'
@@ -43,7 +43,7 @@ const mapDispatchToProps = dispatch => {
 export default withRouter(
   connect(
     state => ({
-      contacts: state.contactList
+      contacts: state.contacts
     }),
     mapDispatchToProps
   )(Rolodex)

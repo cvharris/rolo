@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { updateContact } from '../actions/contactListActions'
+import { updateContact } from '../actions/contactsActions'
 import { updateCurrentContact } from '../actions/currentContactActions'
 import ContactForm from '../components/ContactForm'
 

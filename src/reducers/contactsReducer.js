@@ -9,7 +9,10 @@ export default (state = initialState, action) => {
     case 'REMOVE_CONTACT':
       return state.filter(contact => contact.name !== action.payload.name)
     case 'UPDATE_CONTACT':
-      return state.map(contact => contact.name === action.payload.name ? action.payload : contact)
+      return state.map(
+        contact =>
+          contact.name === action.payload.name ? action.payload : contact
+      )
     default:
       return state
   }
