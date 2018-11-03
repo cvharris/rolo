@@ -1,8 +1,9 @@
+import { normalize } from 'normalizr'
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import firebase from './config/firebase'
-import { loadState } from './config/localStorage'
+import schema from './config/schema'
 import configureStore from './config/store'
 import Rolodex from './containers/Rolodex'
 
@@ -13,31 +14,33 @@ export default class RoloApp extends Component {
       isStoreLoading: true,
       store: null
     }
-    this.stateRef = firebase
-      .database()
-      .ref()
-      .child('contacts')
   }
 
-  componentWillMount() {
-    // this.listenForState(this.stateRef)
-    const persistedState = loadState()
-    this.setState({
-      store: configureStore(persistedState),
-      isStoreLoading: false
-    })
-  }
-
-  listenForState(stateRef) {
-    stateRef.on('value', snapshot => {
-      if (snapshot) {
+  componentDidMount() {
+    // Try to fetch user record
+    // If unauthenticated, show login screen
+    firebase
+      .firestore()
+      .collection('contacts')
+      .get()
+      .then(snapshot => {
+        const normalized = normalize(
+          {
+            contacts: snapshot.docs.map(doc => doc.data())
+          },
+          schema
+        )
+        const mappedStore = {
+          contacts: {
+            allIds: normalized.result.contacts,
+            byId: normalized.entities.contacts
+          }
+        }
         this.setState({
-          store: configureStore(snapshot.val() ? snapshot.val() : []),
+          store: configureStore(mappedStore),
           isStoreLoading: false
         })
-        stateRef.off('value')
-      }
-    })
+      })
   }
 
   render() {
