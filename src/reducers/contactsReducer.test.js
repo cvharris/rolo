@@ -1,12 +1,13 @@
-import Contact from '../lib/Contact';
-import contactsReducer, { initialState } from './contactsReducer';
+import { ADD_CONTACT } from '../config/constants'
+import Contact from '../lib/Contact'
+import contactsReducer, { initialState } from './contactsReducer'
 
 it('Adds contacts to the contact list', () => {
   const newContact = new Contact({ firstName: 'Derp' })
 
   expect(
     contactsReducer(initialState, {
-      type: 'ADD_CONTACT',
+      type: ADD_CONTACT,
       payload: newContact
     })
   ).toHaveLength(1)

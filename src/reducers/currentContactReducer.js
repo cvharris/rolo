@@ -1,17 +1,18 @@
-import Contact from "../lib/Contact";
+import { ADD_CONTACT, UPDATE_CURRENT_CONTACT } from '../config/constants'
+import Contact from '../lib/Contact'
 
 // Initial State
 const initialState = new Contact({})
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'UPDATE_CONTACT_NAME':
+    case UPDATE_CURRENT_CONTACT:
       return {
         ...state,
-        name: action.payload
+        ...action.contact
       }
-    case 'ADD_CONTACT':
-      return initialState
+    case ADD_CONTACT:
+      return new Contact({})
     default:
       return state
   }
