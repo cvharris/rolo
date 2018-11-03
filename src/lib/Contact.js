@@ -1,8 +1,5 @@
-import { v4 } from 'uuid'
-
 export default class Contact {
-  constructor({ id = v4(), firstName = '', lastName = '', company = '' }) {
-    this.id = id
+  constructor({ firstName = '', lastName = '', company = '' }) {
     this.firstName = firstName
     this.lastName = lastName
     this.company = company
