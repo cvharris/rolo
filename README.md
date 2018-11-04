@@ -23,26 +23,31 @@ The family contact app
 - users
   - $userId
     - contactId
+    - contacts (snapshot via functions)
+      - $contactId
     - families
       - $familyId
     - tags
       - $tag
         - $contactId
-- families
+- families (one of more parent with their children)
   - $familyId
     - name
-    - contacts
-      - $contactId
-    - ancestors
-      - $ancestorId (family, sorted youngest to eldest)
+    
     - admins
       - $userId
 - contacts
   - $contactId
     - firstName
     - lastName
-    - relationships
-      - $contactId: label
+    - parents
+      - $contactId
+    - spouse
+      - $contactId
+    - children
+      - $contactId
+    - ancestors
+      - $ancestorId (family, sorted youngest to eldest)
     - addresses
       - $addressId: label
     - phoneNumbers:
@@ -53,6 +58,7 @@ The family contact app
     - dateOfDeath
 - addresses
   - $addressId
+    - label
     - street1
     - street2
     - city

@@ -1,21 +1,29 @@
 export default class Contact {
-  constructor({ firstName = '', lastName = '', company = '' }) {
+  constructor({
+    id = null,
+    firstName = '',
+    lastName = '',
+    phoneNumber = '',
+    email = '',
+    address = null,
+    birthday = null,
+    middleName = '',
+    maidenName = '',
+    spouse = null,
+    parents = [],
+    children = []
+  }) {
+    this.id = id
     this.firstName = firstName
     this.lastName = lastName
-    this.company = company
+    this.phoneNumber = phoneNumber
+    this.email = email
+    this.address = address
+    this.birthday = birthday
+    this.middleName = middleName
+    this.maidenName = maidenName
+    this.spouse = spouse
+    this.parents = parents
+    this.children = children
   }
 }
-
-/*
-  this.phoneNumbers = phoneNumbers
-  this.emails = emails
-  this.addresses = addresses
-  this.nickname = nickname
-  this.birthday = birthday
-  this.middleName = middleName
-  this.maidenName = maidenName
-  this.website = website
-  this.suffix = suffix
-  this.prefix = prefix
-  this.jobTitle = jobTitle
-*/

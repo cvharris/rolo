@@ -24,9 +24,21 @@ export default class RoloApp extends Component {
       .collection('contacts')
       .get()
       .then(snapshot => {
+        const refCleaned = snapshot.docs.map(doc => {
+          const temp = { ...doc.data(), id: doc.id }
+          const contact = {}
+          Object.keys(temp).forEach(key => {
+            contact[key] =
+              temp[key] instanceof firebase.firestore.DocumentReference
+                ? temp[key].id
+                : temp[key]
+          })
+          return contact
+        })
+        console.log(refCleaned)
         const normalized = normalize(
           {
-            contacts: snapshot.docs.map(doc => doc.data())
+            contacts: refCleaned
           },
           schema
         )

@@ -1,4 +1,8 @@
-import { ADD_CONTACT, REMOVE_CONTACT, UPDATE_CONTACT } from '../config/constants';
+import {
+  ADD_CONTACT,
+  REMOVE_CONTACT,
+  UPDATE_CONTACT
+} from '../config/constants'
 
 // Initial State
 export const initialState = {

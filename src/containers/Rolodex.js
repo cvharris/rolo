@@ -43,7 +43,7 @@ const mapDispatchToProps = dispatch => {
 export default withRouter(
   connect(
     state => ({
-      contacts: state.contacts
+      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId])
     }),
     mapDispatchToProps
   )(Rolodex)

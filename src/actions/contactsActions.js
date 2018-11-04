@@ -15,6 +15,12 @@ export const pushContact = newContact => {
   }
 }
 
+export const uploadMultipleContacts = contacts => {
+  return dispatch => {
+    return firebase.firestore().collection('contacts')
+  }
+}
+
 export const addContact = newContact => ({
   type: ADD_CONTACT,
   newContact
