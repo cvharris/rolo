@@ -5,6 +5,7 @@ export default class Contact {
     lastName = '',
     phoneNumber = '',
     email = '',
+    gender = '',
     address = null,
     birthday = null,
     middleName = '',
@@ -18,6 +19,7 @@ export default class Contact {
     this.lastName = lastName
     this.phoneNumber = phoneNumber
     this.email = email
+    this.gender = gender
     this.address = address
     this.birthday = birthday
     this.middleName = middleName

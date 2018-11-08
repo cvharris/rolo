@@ -1,0 +1,32 @@
+[debug] [2018-11-05T23:57:47.415Z] ----------------------------------------------------------------------
+[debug] [2018-11-05T23:57:47.417Z] Command:       /Users/charlie.harris/.nvm/versions/node/v8.12.0/bin/node /Users/charlie.harris/.nvm/versions/node/v8.12.0/bin/firebase serve
+[debug] [2018-11-05T23:57:47.417Z] CLI Version:   6.0.1
+[debug] [2018-11-05T23:57:47.417Z] Platform:      darwin
+[debug] [2018-11-05T23:57:47.417Z] Node Version:  v8.12.0
+[debug] [2018-11-05T23:57:47.418Z] Time:          Mon Nov 05 2018 17:57:47 GMT-0600 (CST)
+[debug] [2018-11-05T23:57:47.418Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-11-05T23:57:47.533Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-11-05T23:57:47.534Z] > authorizing via signed-in user
+[debug] [2018-11-05T23:57:47.534Z] [iam] checking project rolo-1014 for permissions ["firebase.projects.get"]
+[debug] [2018-11-05T23:57:47.536Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-11-05T23:57:47.536Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2018-11-05T23:57:47.890Z] <<< HTTP RESPONSE 200
+[debug] [2018-11-05T23:57:47.902Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/rolo-1014:testIamPermissions  
+
+[debug] [2018-11-05T23:57:48.628Z] <<< HTTP RESPONSE 200
+[debug] [2018-11-05T23:57:48.629Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/rolo-1014  
+ 
+[debug] [2018-11-05T23:57:48.860Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/charlie.harris/Sites/rolo'...
+[info] 
+[info] i  functions: Preparing to emulate functions.
+[debug] [2018-11-05T23:57:55.664Z] Fetching environment
+[debug] [2018-11-05T23:57:55.666Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/35495241567:getServerAppConfig  
+ 
+[debug] [2018-11-05T23:57:56.026Z] <<< HTTP RESPONSE 200
+[debug] [2018-11-05T23:57:56.026Z] Starting @google-cloud/functions-emulator
+[debug] [2018-11-05T23:57:59.084Z] Parsing function triggers
+[info] ✔  functions: uploadContactsCSV: http://localhost:5000/rolo-1014/us-central1/uploadContactsCSV

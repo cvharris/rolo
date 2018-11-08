@@ -14,6 +14,7 @@ The family contact app
 
 ## TODO
 
+- [ ] Can upload CSV to Google and it is converted to JSON
 - [ ] Users log in with google, email, or phone number
 - [ ] On login, load all families and all contacts in those families
 - [ ] Security rules prevent adding or editing contacts from families you aren't a part of
