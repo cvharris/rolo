@@ -12,13 +12,15 @@ class Sidebar extends Component {
             <span className="link dim white dib mr3">List</span>
           </NavLink>
           <NavLink to="/new-contact">
-            <span className="link dim white dib">Add</span>
+            <span className="link dim white dib mr3">Add</span>
+          </NavLink>
+          <NavLink to="/upload-contacts">
+            <span className="link dim white dib">Upload</span>
           </NavLink>
         </nav>
       </header>
-    );
+    )
   }
 }
 
-export default connect((state) => ({
-}))(Sidebar);
+export default connect(state => ({}))(Sidebar)

@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import firebase from '../config/firebase'
 import contactFields from '../lib/contactFields'
 
 export default class ContactsList extends Component {
@@ -38,7 +39,11 @@ export default class ContactsList extends Component {
             >
               {Object.keys(contactFields).map((key, j) => (
                 <div className="contact-col pl3 flex-auto" key={j}>
-                  <span className="f6 db black-70">{contact[key]}</span>
+                  <span className="f6 db black-70">
+                    {contact[key] instanceof firebase.firestore.Timestamp
+                      ? contact[key].toDate().toDateString()
+                      : contact[key]}
+                  </span>
                 </div>
               ))}
             </div>

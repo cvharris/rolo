@@ -7,6 +7,7 @@ import ContactsList from '../components/ContactsList'
 import AddContact from './AddContact'
 import EditContact from './EditContact'
 import Sidebar from './Sidebar'
+import UploadContacts from './UploadContacts'
 
 class Rolodex extends Component {
   render() {
@@ -26,6 +27,7 @@ class Rolodex extends Component {
           />
           <Route path="/new-contact" component={AddContact} />
           <Route path="/edit-contact/:contactName" component={EditContact} />
+          <Route path="/upload-contacts" component={UploadContacts} />
         </div>
       </div>
     )

@@ -35,7 +35,6 @@ export default class RoloApp extends Component {
           })
           return contact
         })
-        console.log(refCleaned)
         const normalized = normalize(
           {
             contacts: refCleaned

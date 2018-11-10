@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ES6",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "checkJs": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "jsx": "react"
+    "baseUrl": "./src/",
+    "paths": {
+      "*": [
+        "*"
+      ]
+    }
   },
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/node_modules/*"
   ]
 }
