@@ -48,6 +48,7 @@ export default class RoloApp extends Component {
             byId: normalized.entities.contacts
           }
         }
+        console.log(mappedStore)
         this.setState({
           store: configureStore(mappedStore),
           isStoreLoading: false
