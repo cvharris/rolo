@@ -5,14 +5,14 @@ export default class Contact {
     lastName = '',
     phoneNumber = '',
     email = '',
-    gender = '',
-    address = null,
-    birthday = null,
+    gender = '', //drop down selector
+    address = null, //own compoent with multiple fields
+    birthday = null, //date picker
     middleName = '',
     maidenName = '',
-    spouse = null,
-    parents = [],
-    children = []
+    spouse = null, //auto complete select list
+    parents = [], //auto complete select list
+    children = [] //auto complete select list
   }) {
     this.id = id
     this.firstName = firstName

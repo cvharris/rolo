@@ -1,6 +1,6 @@
+import firebase from 'config/firebase'
+import contactFields from 'lib/contactFields'
 import React, { Component } from 'react'
-import firebase from '../config/firebase'
-import contactFields from '../lib/contactFields'
 
 export default class ContactsList extends Component {
   render() {
@@ -13,7 +13,7 @@ export default class ContactsList extends Component {
     return (
       <div className="rolo-table">
         <div
-          className="rolo-table-header"
+          className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline"
           style={{
             gridTemplateColumns: `repeat(${
               Object.keys(contactFields).length
@@ -29,7 +29,7 @@ export default class ContactsList extends Component {
         <div className="rolo-table-body">
           {contacts.map((contact, i) => (
             <div
-              className="contact-row items-center lh-copy pa3 ph0-l bb b--black-10"
+              className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
               key={i}
               style={{
                 gridTemplateColumns: `repeat(${
