@@ -27,22 +27,22 @@ export default class ContactsList extends Component {
           ))}
         </div>
         <div className="rolo-table-body">
-          {contacts.map((contact, i) => (
+          {contacts.map(contact => (
             <div
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
-              key={i}
+              key={contact.id}
               style={{
                 gridTemplateColumns: `repeat(${
                   Object.keys(contactFields).length
                 }, 1fr)`
               }}
             >
-              {Object.keys(contactFields).map((key, j) => (
-                <div className="contact-col pl3 flex-auto" key={j}>
+              {Object.keys(contactFields).map((field, i) => (
+                <div className="contact-col pl3 flex-auto" key={i}>
                   <span className="f6 db black-70">
-                    {contact[key] instanceof firebase.firestore.Timestamp
-                      ? contact[key].toDate().toDateString()
-                      : contact[key]}
+                    {contact[field] instanceof firebase.firestore.Timestamp
+                      ? contact[field].toDate().toDateString()
+                      : contact[field]}
                   </span>
                 </div>
               ))}

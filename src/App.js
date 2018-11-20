@@ -22,6 +22,8 @@ export default class RoloApp extends Component {
     firebase
       .firestore()
       .collection('contacts')
+      .orderBy('lastName')
+      .orderBy('firstName')
       .get()
       .then(snapshot => {
         const refCleaned = snapshot.docs.map(doc => {
@@ -41,13 +43,37 @@ export default class RoloApp extends Component {
           },
           schema
         )
+        // const dataStr =
+        //   'data:text/json;charset=utf-8,' +
+        //   encodeURIComponent(
+        //     JSON.stringify(
+        //       normalized.result.contacts.map(cId => {
+        //         const contact = normalized.entities.contacts[cId]
+        //         return {
+        //           ...contact,
+        //           parents: contact.parents.length
+        //             ? contact.parents.map(par => par.id)
+        //             : [],
+        //           children: contact.children.length
+        //             ? contact.children.map(child => child.id)
+        //             : []
+        //         }
+        //       })
+        //     )
+        //   )
+        // const downloadAnchorNode = document.createElement('a')
+        // downloadAnchorNode.setAttribute('href', dataStr)
+        // downloadAnchorNode.setAttribute('download', 'data.json')
+        // document.body.appendChild(downloadAnchorNode) // required for firefox
+        // downloadAnchorNode.click()
+        // downloadAnchorNode.remove()
         const mappedStore = {
           contacts: {
             allIds: normalized.result.contacts,
             byId: normalized.entities.contacts
           }
         }
-        console.log(mappedStore)
+
         this.setState({
           store: configureStore(mappedStore),
           isStoreLoading: false

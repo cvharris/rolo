@@ -1,9 +1,7 @@
 export default {
   firstName: 'First Name',
-  middleName: 'Middle Name',
-  maidenName: 'Maiden Name',
   lastName: 'Last Name',
-  phoneNumbers: 'Phone Numbers',
+  phoneNumber: 'Phone Number',
   email: 'Email Address',
   address: 'Home Address',
   birthday: 'Birthday'
