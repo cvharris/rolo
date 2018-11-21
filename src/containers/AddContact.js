@@ -21,7 +21,7 @@ const mapDispatchToProps = (dispatch, props) => ({
   addContact: newContact => {
     const readyContact = {
       ...newContact,
-      spouse: db.doc(`/contacts/${newContact.value}`)
+      spouse: db.doc(`/contacts/${newContact.spouse.value}`)
     }
     dispatch(pushContact(readyContact))
     props.history.push('/')
