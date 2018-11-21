@@ -1,6 +1,5 @@
 export default class Contact {
   constructor({
-    id = null,
     firstName = '',
     lastName = '',
     phoneNumber = '',
@@ -14,7 +13,6 @@ export default class Contact {
     parents = [], //auto complete select list
     children = [] //auto complete select list
   }) {
-    this.id = id
     this.firstName = firstName
     this.lastName = lastName
     this.phoneNumber = phoneNumber

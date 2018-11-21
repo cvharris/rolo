@@ -1,7 +1,5 @@
-const uniq = require('lodash/uniq')
-const allContacts = require('./data.json')
-const contactId = 'hCZSqNowfVthp3onEsWI'
-const contact = allContacts.find(con => con.id === contactId)
+import uniq from 'lodash/uniq'
+import allContacts from './allContacts.json'
 
 const getSpouseParents = (contact, parents) => {
   let newParents = [...parents]
@@ -71,13 +69,11 @@ const getSpouseChildren = (contact, relatives) => {
   return uniq(newRelatives)
 }
 
-const getAllRelatives = contact => {
+export default contact => {
   let relatives = [] // array of DocumentReferences
   let parents = []
 
-  if (contact.parents && !!contact.parents.length) {
-    parents = getParents(contact, parents)
-  }
+  parents = getParents(contact, parents)
 
   if (!!parents.length) {
     relatives = parents.reduce((allRelatives, parentId) => {
@@ -98,9 +94,8 @@ const getAllRelatives = contact => {
     const contact = allContacts.find(con => con.id === relId)
     return `${contact.firstName} ${contact.lastName}`
   })
-  console.log(namedResults)
+
+  // console.info(namedResults)
 
   return relatives
 }
-
-getAllRelatives(contact)

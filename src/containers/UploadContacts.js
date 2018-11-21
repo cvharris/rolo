@@ -1,5 +1,5 @@
 import ContactsList from 'components/ContactsList'
-import firebase from 'config/firebase'
+import firebase, { db } from 'config/firebase'
 import Papa from 'papaparse'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -14,8 +14,14 @@ class UploadContacts extends Component {
   }
 
   uploadContacts = async () => {
+    const { uploadedContacts, uploadProgress } = this.state
+    this.setState({
+      ...this.state,
+      fileSize: uploadedContacts.length,
+      uploading: true
+    })
     await Promise.all(
-      this.state.uploadedContacts.map(contact => {
+      uploadedContacts.map(contact => {
         const {
           firstName,
           lastName,
@@ -27,8 +33,11 @@ class UploadContacts extends Component {
           children,
           spouse
         } = contact
-        return firebase
-          .firestore()
+        this.setState({
+          ...this.state,
+          uploadProgress: uploadProgress + 1
+        })
+        return db
           .collection('contacts')
           .doc(contact.id)
           .set({
@@ -44,9 +53,17 @@ class UploadContacts extends Component {
           })
       })
     )
+
+    this.setState({
+      ...this.state,
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false
+    })
   }
 
   handleUploadedSpreadsheet = file => {
+    // Build the list of uploaded contacts
     const contacts = []
 
     this.setState({
@@ -59,49 +76,47 @@ class UploadContacts extends Component {
       header: true,
       skipEmptyLines: true,
       step: async (row, parser) => {
-        // TODO: check for errors
+        if (row.errors.length) {
+          parser.abort()
+          console.error(row.errors)
+        }
 
+        // Pause the parser to wait for async functions to run
         parser.pause()
         const contact = row.data[0]
         // Check if contact already exists
-        let docRef = firebase
-          .firestore()
-          .collection('contacts')
-          .doc(contact.id)
+        let docRef = db.collection('contacts').doc(contact.id)
         let foundContact = await docRef.get()
         if (foundContact.exists) {
           // update it
           contact.clientId = contact.id
           contact.id = foundContact.id
+          contacts.push(Object.assign(foundContact, contact))
         } else {
-          docRef = firebase
-            .firestore()
-            .collection('contacts')
-            .where('firstName', '==', contact.firstName)
-            .where('birthday', '==', contact.birthday)
-          const results = await docRef.get()
-          if (results.docs.length > 0) {
-            // update it
-            foundContact = results.docs[0]
-            contact.clientId = contact.id
-            contact.id = foundContact.id
-          } else {
-            // else create new id for it
-            docRef = firebase
-              .firestore()
-              .collection('contacts')
-              .doc()
-            contact.clientId = contact.id
-            contact.id = docRef.id
-          }
+          // docRef = db
+          //   .collection('contacts')
+          //   .where('firstName', '==', contact.firstName)
+          //   .where('birthday', '==', contact.birthday)
+          // const results = await docRef.get()
+          // if (results.docs.length > 0) {
+          //   // update it
+          //   foundContact = results.docs[0]
+          //   contact.clientId = contact.id
+          //   contact.id = foundContact.id
+          //   contacts.push(Object.assign(foundContact, contact))
+          // } else {
+          // else create new id for it
+          docRef = db.collection('contacts').doc()
+          contact.clientId = contact.id
+          contact.id = docRef.id
+          contacts.push(contact)
+          // }
         }
-        contacts.push(contact)
         this.setState({
           ...this.state,
           uploadProgress: this.state.uploadProgress + row.meta.cursor
         })
         parser.resume()
-        // parser.abort()
       },
       transform: (val, col) => {
         switch (col) {
@@ -131,23 +146,19 @@ class UploadContacts extends Component {
           contact.children = contact.children.map(child => {
             const childId = child.match(/(\d+)$/)
             const childRef = contacts.find(con => con.clientId === childId[1])
-            return childRef
-              ? firebase.firestore().doc(`/contacts/${childRef.id}`)
-              : child
+            return childRef ? db.doc(`/contacts/${childRef.id}`) : child
           })
           contact.parents = contact.parents.map(parent => {
             const parentId = parent.match(/(\d+)$/)
             const parentRef = contacts.find(con => con.clientId === parentId[1])
-            return parentRef
-              ? firebase.firestore().doc(`/contacts/${parentRef.id}`)
-              : parent
+            return parentRef ? db.doc(`/contacts/${parentRef.id}`) : parent
           })
           if (contact.spouse) {
             const spouseRef = contacts.find(
               con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
             )
             contact.spouse = spouseRef
-              ? firebase.firestore().doc(`/contacts/${spouseRef.id}`)
+              ? db.doc(`/contacts/${spouseRef.id}`)
               : contact.spouse
           }
         })
