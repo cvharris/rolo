@@ -3,6 +3,7 @@ import {
   REMOVE_CONTACT,
   UPDATE_CONTACT
 } from '../config/constants'
+import { createSelector } from 'reselect'
 
 // Initial State
 export const initialState = {
@@ -33,3 +34,16 @@ export default (state = initialState, action) => {
       return state
   }
 }
+
+// Getters
+const allContactsSelector = state =>
+  state.contacts.allIds.map(contactId => state.contacts.byId[contactId])
+
+export const getTypeAheadOptions = createSelector(
+  allContactsSelector,
+  contacts =>
+    contacts.map(contact => ({
+      value: contact.id,
+      label: `${contact.firstName} ${contact.lastName}`
+    }))
+)

@@ -11,7 +11,10 @@ export default class Contact {
     maidenName = '',
     spouse = null, //auto complete select list
     parents = [], //auto complete select list
-    children = [] //auto complete select list
+    children = [], //auto complete select list
+    prefix = '',
+    suffix = '',
+    dod = null
   }) {
     this.firstName = firstName
     this.lastName = lastName
@@ -25,5 +28,8 @@ export default class Contact {
     this.spouse = spouse
     this.parents = parents
     this.children = children
+    this.prefix = prefix
+    this.suffix = suffix
+    this.dod = dod
   }
 }

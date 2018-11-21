@@ -1,3 +1,4 @@
+import { db } from 'config/firebase'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -18,7 +19,11 @@ class AddContact extends Component {
 
 const mapDispatchToProps = (dispatch, props) => ({
   addContact: newContact => {
-    dispatch(pushContact(newContact))
+    const readyContact = {
+      ...newContact,
+      spouse: db.doc(`/contacts/${newContact.value}`)
+    }
+    dispatch(pushContact(readyContact))
     props.history.push('/')
   }
 })
