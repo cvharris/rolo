@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Select from 'react-select'
 import { connect } from 'react-redux'
+import Select from 'react-select'
 import { getTypeAheadOptions } from 'reducers/contactsReducer'
 
 class ContactForm extends Component {
@@ -18,7 +18,7 @@ class ContactForm extends Component {
 
   handleSelectChange = (option, name) => {
     this.setState({
-      [name]: option.value
+      [name]: option
     })
   }
 
