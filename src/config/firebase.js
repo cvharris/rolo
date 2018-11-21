@@ -18,4 +18,6 @@ firestore.settings({
   timestampsInSnapshots: true
 })
 
+export const db = firebase.firestore()
+
 export default firebase
