@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
+import Select from 'react-select'
+import { connect } from 'react-redux'
+import { getTypeAheadOptions } from 'reducers/contactsReducer'
 
-export default class ContactForm extends Component {
+class ContactForm extends Component {
   constructor(props) {
     super(props)
 
@@ -13,71 +16,195 @@ export default class ContactForm extends Component {
     })
   }
 
+  handleSelectChange = (option, name) => {
+    this.setState({
+      [name]: option.value
+    })
+  }
+
   onSubmit = e => {
     this.props.onContactSubmit(this.state)
     e.preventDefault()
   }
 
   render() {
-    return <div className="contact-form">
+    return (
+      <div className="contact-form">
         <header className="tc pv2 pv5-ns">
-          <img src="http://tachyons.io/img/logo.jpg" className="br-100 pa1 ba b--black-10 h3 w3" alt="avatar" />
+          <img
+            src="http://tachyons.io/img/logo.jpg"
+            className="br-100 pa1 ba b--black-10 h3 w3"
+            alt="avatar"
+          />
           <h1 className="f5 f4-ns fw6 mid-gray">
             {this.state.firstName || this.state.lastName
               ? `${this.state.firstName} ${this.state.lastName}`
               : 'New Contact'}
           </h1>
-          {this.state.company && <h2 className="f6 gray fw2 ttu tracked">
-              {this.state.company}
-            </h2>}
+          {this.state.company && (
+            <h2 className="f6 gray fw2 ttu tracked">{this.state.company}</h2>
+          )}
         </header>
         <div className="measure center">
           <form className="pa4 black-80" onSubmit={this.onSubmit}>
             <label htmlFor="firstName" className="f6 b db mb2">
               First Name
-              <input id="firstName" className="input-reset ba b--black-20 pa2 mb3 db w-100" type="text" name="firstName" value={this.state.firstName} onChange={this.handleInputChange} />
+              <input
+                id="firstName"
+                className="input-reset ba b--black-20 pa2 mb3 db w-100"
+                type="text"
+                name="firstName"
+                value={this.state.firstName}
+                onChange={this.handleInputChange}
+              />
             </label>
             <label htmlFor="middleName" className="f6 b db mb2">
               Middle Name
-              <input id="middleName" className="input-reset ba b--black-20 pa2 mb3 db w-100" type="text" name="middleName" value={this.state.middleName} onChange={this.handleInputChange} />
+              <input
+                id="middleName"
+                className="input-reset ba b--black-20 pa2 mb3 db w-100"
+                type="text"
+                name="middleName"
+                value={this.state.middleName}
+                onChange={this.handleInputChange}
+              />
             </label>
             <label htmlFor="maidenName" className="f6 b db mb2">
               Maiden Name (If Applicable)
-              <input id="maidenName" className="input-reset ba b--black-20 pa2 mb3 db w-100" type="text" name="maidenName" value={this.state.maidenName} onChange={this.handleInputChange} />
+              <input
+                id="maidenName"
+                className="input-reset ba b--black-20 pa2 mb3 db w-100"
+                type="text"
+                name="maidenName"
+                value={this.state.maidenName}
+                onChange={this.handleInputChange}
+              />
             </label>
             <label htmlFor="lastName" className="f6 b db mb2">
               Last Name
-              <input id="lastName" className="input-reset ba b--black-20 pa2 mb4 db w-100" type="text" name="lastName" value={this.state.lastName} onChange={this.handleInputChange} />
+              <input
+                id="lastName"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="text"
+                name="lastName"
+                value={this.state.lastName}
+                onChange={this.handleInputChange}
+              />
             </label>
-              <label htmlFor="phoneNumbers" className="f6 b db mb2">
+            <label htmlFor="prefix" className="f6 b db mb2">
+              Prefix
+              <input
+                id="prefix"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="text"
+                name="prefix"
+                value={this.state.prefix}
+                onChange={this.handleInputChange}
+              />
+            </label>
+            <label htmlFor="suffix" className="f6 b db mb2">
+              Suffix
+              <input
+                id="suffix"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="text"
+                name="suffix"
+                value={this.state.suffix}
+                onChange={this.handleInputChange}
+              />
+            </label>
+
+            <label htmlFor="gender" className="f6 b db mb2">
+              Gender
+              <select
+                id="gender"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                name="gender"
+                value={this.state.gender}
+                onChange={this.handleInputChange}
+              >
+                <option value="">--</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+              </select>
+            </label>
+
+            <label htmlFor="phoneNumbers" className="f6 b db mb2">
               Phone Numbers
               <input
                 id="phoneNumbers"
                 className="input-reset ba b--black-20 pa2 mb3 db w-100"
                 type="tel"
                 name="phoneNumbers"
-                value={this.state.phoneNumbers || ""}
+                value={this.state.phoneNumbers || ''}
                 onChange={this.handleInputChange}
               />
             </label>
             <label htmlFor="email" className="f6 b db mb2">
               E-Mail Address
-              <input id="email" className="input-reset ba b--black-20 pa2 mb4 db w-100" type="text" name="email" value={this.state.email} onChange={this.handleInputChange} />
+              <input
+                id="email"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="text"
+                name="email"
+                value={this.state.email}
+                onChange={this.handleInputChange}
+              />
             </label>
             <label htmlFor="address" className="f6 b db mb2">
               Home Address
-              <input id="address" className="input-reset ba b--black-20 pa2 mb4 db w-100" type="text" name="address" value={this.state.address || ""} onChange={this.handleInputChange} />
+              <input
+                id="address"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="text"
+                name="address"
+                value={this.state.address || ''}
+                onChange={this.handleInputChange}
+              />
             </label>
             <label htmlFor="birthday" className="f6 b db mb2">
               Birthday
-              <input id="birthday" className="input-reset ba b--black-20 pa2 mb4 db w-100" type="text" name="birthday" value={this.state.birthday || ""} onChange={this.handleInputChange} />
+              <input
+                id="birthday"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="date"
+                name="birthday"
+                value={this.state.birthday || ''}
+                onChange={this.handleInputChange}
+              />
+            </label>
+            <label htmlFor="dod" className="f6 b db mb2">
+              Date of Death
+              <input
+                id="dod"
+                className="input-reset ba b--black-20 pa2 mb4 db w-100"
+                type="date"
+                name="dod"
+                value={this.state.dod || ''}
+                onChange={this.handleInputChange}
+              />
             </label>
 
-            <button type="submit" className="f6 link dim br3 ph3 pv2 mb2 dib white bg-dark-blue">
+            <Select
+              options={this.props.typeAheadOptions}
+              value={this.state.spouse}
+              onChange={option => this.handleSelectChange(option, 'spouse')}
+              name="spouse"
+            />
+
+            <button
+              type="submit"
+              className="f6 link dim br3 ph3 pv2 mb2 dib white bg-dark-blue"
+            >
               Create New Contact!
             </button>
           </form>
         </div>
       </div>
+    )
   }
 }
+
+export default connect(state => ({
+  typeAheadOptions: getTypeAheadOptions(state)
+}))(ContactForm)
