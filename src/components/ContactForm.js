@@ -18,7 +18,7 @@ class ContactForm extends Component {
 
   handleSelectChange = (option, name) => {
     this.setState({
-      [name]: option.value
+      [name]: option
     })
   }
 
@@ -184,12 +184,29 @@ class ContactForm extends Component {
                 onChange={this.handleInputChange}
               />
             </label>
-
+            <label className="f6 b db mt2">Spouse</label>
             <Select
               options={this.props.typeAheadOptions}
               value={this.state.spouse}
               onChange={option => this.handleSelectChange(option, 'spouse')}
               name="spouse"
+            />
+            <label className="f6 b db mt2">Children</label>
+            <Select
+              options={this.props.typeAheadOptions}
+              value={this.state.children}
+              onChange={option => this.handleSelectChange(option, 'children')}
+              name="children"
+              isMulti={true}
+            />
+
+            <label className="f6 b db mt2">Parents</label>
+            <Select
+              options={this.props.typeAheadOptions}
+              value={this.state.parents}
+              onChange={option => this.handleSelectChange(option, 'parents')}
+              name="parents"
+              isMulti={true}
             />
 
             <button
