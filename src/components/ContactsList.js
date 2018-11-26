@@ -1,8 +1,13 @@
 import firebase from 'config/firebase'
 import contactFields from 'lib/contactFields'
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 export default class ContactsList extends Component {
+  editContent = e => {
+    console.log('You are going to edit!')
+  }
+
   render() {
     const { contacts } = this.props
 
@@ -28,7 +33,7 @@ export default class ContactsList extends Component {
         </div>
         <div className="rolo-table-body">
           {contacts.map((contact, i) => (
-            <div
+            <Link
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
               key={contact.id}
               style={{
@@ -36,6 +41,7 @@ export default class ContactsList extends Component {
                   Object.keys(contactFields).length
                 }, 1fr)`
               }}
+              to={`/edit-contact/${contact.id}`}
             >
               {Object.keys(contactFields).map((key, j) => (
                 <div className="contact-col pl3 flex-auto" key={j}>
@@ -46,7 +52,7 @@ export default class ContactsList extends Component {
                   </span>
                 </div>
               ))}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
