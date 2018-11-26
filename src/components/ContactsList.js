@@ -17,7 +17,7 @@ export default class ContactsList extends Component {
           style={{
             gridTemplateColumns: `repeat(${
               Object.keys(contactFields).length
-              }, 1fr)`
+            }, 1fr)`
           }}
         >
           {Object.values(contactFields).map((header, i) => (
@@ -30,11 +30,11 @@ export default class ContactsList extends Component {
           {contacts.map((contact, i) => (
             <div
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
-              key={i}
+              key={contact.id}
               style={{
                 gridTemplateColumns: `repeat(${
                   Object.keys(contactFields).length
-                  }, 1fr)`
+                }, 1fr)`
               }}
             >
               {Object.keys(contactFields).map((key, j) => (
