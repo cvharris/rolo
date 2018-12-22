@@ -3,6 +3,20 @@ import contactFields from 'lib/contactFields'
 import React, { Component } from 'react'
 
 export default class ContactsList extends Component {
+  renderContactRow = field => {
+    if (!field) {
+      return field
+    }
+    switch (field.constructor) {
+      case firebase.firestore.Timestamp:
+        return field.toDate().toDateString()
+      case Array:
+        return field.join(', ')
+      default:
+        return field
+    }
+  }
+
   render() {
     const { contacts } = this.props
 
@@ -17,7 +31,7 @@ export default class ContactsList extends Component {
           style={{
             gridTemplateColumns: `repeat(${
               Object.keys(contactFields).length
-              }, 1fr)`
+            }, 1fr)`
           }}
         >
           {Object.values(contactFields).map((header, i) => (
@@ -34,15 +48,13 @@ export default class ContactsList extends Component {
               style={{
                 gridTemplateColumns: `repeat(${
                   Object.keys(contactFields).length
-                  }, 1fr)`
+                }, 1fr)`
               }}
             >
               {Object.keys(contactFields).map((field, i) => (
                 <div className="contact-col pl3 flex-auto" key={i}>
                   <span className="f6 db black-70">
-                    {contact[field] instanceof firebase.firestore.Timestamp
-                      ? contact[field].toDate().toDateString()
-                      : contact[field]}
+                    {this.renderContactRow(contact[field])}
                   </span>
                 </div>
               ))}

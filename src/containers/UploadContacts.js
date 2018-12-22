@@ -1,9 +1,9 @@
-import ContactsList from 'components/ContactsList';
-import firebase, { db } from 'config/firebase';
-import Papa from 'papaparse';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import ContactsList from 'components/ContactsList'
+import firebase, { db } from 'config/firebase'
+import parseUploadedContacts from 'lib/parseUploadedContacts'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 class UploadContacts extends Component {
   state = {
@@ -13,12 +13,52 @@ class UploadContacts extends Component {
     uploadedContacts: []
   }
 
+  componentDidMount() {
+    const uploadedContacts = JSON.parse(
+      localStorage.getItem('uploadedContacts')
+    )
+    if (uploadedContacts) {
+      this.setState({
+        ...this.state,
+        uploadedContacts
+      })
+    }
+  }
+
   uploadContacts = async () => {
     const { uploadedContacts, uploadProgress } = this.state
     this.setState({
       ...this.state,
       fileSize: uploadedContacts.length,
       uploading: true
+    })
+    // fix references
+    uploadedContacts.forEach(contact => {
+      contact.birthday = firebase.firestore.Timestamp.fromDate(
+        new Date(contact.birthday)
+      )
+      contact.children = contact.children.map(child => {
+        const childId = child.match(/(\d+)$/)
+        const childRef = uploadedContacts.find(
+          con => con.clientId === childId[1]
+        )
+        return childRef ? db.doc(`/uploadedContacts/${childRef.id}`) : child
+      })
+      contact.parents = contact.parents.map(parent => {
+        const parentId = parent.match(/(\d+)$/)
+        const parentRef = uploadedContacts.find(
+          con => con.clientId === parentId[1]
+        )
+        return parentRef ? db.doc(`/uploadedContacts/${parentRef.id}`) : parent
+      })
+      if (contact.spouse) {
+        const spouseRef = uploadedContacts.find(
+          con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
+        )
+        contact.spouse = spouseRef
+          ? db.doc(`/uploadedContacts/${spouseRef.id}`)
+          : contact.spouse
+      }
     })
     await Promise.all(
       uploadedContacts.map(contact => {
@@ -54,131 +94,64 @@ class UploadContacts extends Component {
       })
     )
 
+    localStorage.removeItem('uploadedContacts')
+
     this.setState({
-      ...this.state,
       uploadProgress: 0,
       fileSize: 1,
-      uploading: false
+      uploading: false,
+      uploadedContacts: []
+    })
+  }
+
+  onSingleUpload = cursorPosition => {
+    this.setState({
+      ...this.state,
+      uploadProgress: this.state.uploadProgress + cursorPosition
+    })
+  }
+
+  onUploadError = (err, reason) => {
+    this.setState({
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false,
+      uploadedContacts: []
+    })
+  }
+
+  onUploadComplete = contacts => {
+    localStorage.setItem('uploadedContacts', JSON.stringify(contacts))
+    this.setState({
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false,
+      uploadedContacts: contacts
     })
   }
 
   handleUploadedSpreadsheet = file => {
-    // Build the list of uploaded contacts
-    const contacts = []
-
     this.setState({
       ...this.state,
       uploading: true,
       fileSize: file.size
     })
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      step: async (row, parser) => {
-        if (row.errors.length) {
-          parser.abort()
-          console.error(row.errors)
-        }
-
-        // Pause the parser to wait for async functions to run
-        parser.pause()
-        const contact = row.data[0]
-        // Check if contact already exists
-        let docRef = db.collection('contacts').doc(contact.id)
-        let foundContact = await docRef.get()
-        if (foundContact.exists) {
-          // update it
-          contact.clientId = contact.id
-          contact.id = foundContact.id
-          contacts.push(Object.assign(foundContact, contact))
-        } else {
-          // docRef = db
-          //   .collection('contacts')
-          //   .where('firstName', '==', contact.firstName)
-          //   .where('birthday', '==', contact.birthday)
-          // const results = await docRef.get()
-          // if (results.docs.length > 0) {
-          //   // update it
-          //   foundContact = results.docs[0]
-          //   contact.clientId = contact.id
-          //   contact.id = foundContact.id
-          //   contacts.push(Object.assign(foundContact, contact))
-          // } else {
-          // else create new id for it
-          docRef = db.collection('contacts').doc()
-          contact.clientId = contact.id
-          contact.id = docRef.id
-          contacts.push(contact)
-          // }
-        }
-        this.setState({
-          ...this.state,
-          uploadProgress: this.state.uploadProgress + row.meta.cursor
-        })
-        parser.resume()
-      },
-      transform: (val, col) => {
-        switch (col) {
-          case 'firstName':
-          case 'lastName':
-          case 'email':
-          case 'phoneNumber':
-          case 'gender':
-            return val ? val.trim() : ''
-          case 'parents':
-          case 'children':
-            return val ? val.split(',') : []
-          case 'spouse':
-            return val ? val : null
-          case 'dod':
-          case 'birthday':
-            return val
-              ? firebase.firestore.Timestamp.fromDate(new Date(val))
-              : null
-          default:
-            return val
-        }
-      },
-      complete: () => {
-        // fix references
-        contacts.forEach(contact => {
-          contact.children = contact.children.map(child => {
-            const childId = child.match(/(\d+)$/)
-            const childRef = contacts.find(con => con.clientId === childId[1])
-            return childRef ? db.doc(`/contacts/${childRef.id}`) : child
-          })
-          contact.parents = contact.parents.map(parent => {
-            const parentId = parent.match(/(\d+)$/)
-            const parentRef = contacts.find(con => con.clientId === parentId[1])
-            return parentRef ? db.doc(`/contacts/${parentRef.id}`) : parent
-          })
-          if (contact.spouse) {
-            const spouseRef = contacts.find(
-              con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
-            )
-            contact.spouse = spouseRef
-              ? db.doc(`/contacts/${spouseRef.id}`)
-              : contact.spouse
-          }
-        })
-        this.setState({
-          uploadProgress: 0,
-          fileSize: 1,
-          uploading: false,
-          uploadedContacts: contacts
-        })
-      }
-    })
+    parseUploadedContacts(
+      file,
+      this.onSingleUpload,
+      this.onUploadComplete,
+      this.onUploadError
+    )
   }
 
   render() {
     const { uploadedContacts, uploadProgress, uploading, fileSize } = this.state
 
     return (
-      <div className="measure-wide center pt3 pb6">
+      <div className="pt3 pb6">
         {uploading && (
-          <div className="progress-bar">
+          <div className="measure-wide center progress-bar">
             <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
               <div
                 className="bg-blue br-pill h1 shadow-1"
@@ -190,7 +163,7 @@ class UploadContacts extends Component {
           </div>
         )}
         {uploadedContacts.length === 0 && (
-          <div className="instructions lh-copy">
+          <div className="instructions measure-wide center lh-copy">
             <h4>Upload Contacts</h4>
             <p>
               Upload a *.csv file with your contacts' information.
