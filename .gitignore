@@ -22,3 +22,7 @@ yarn-error.log*
 
 # firebase
 firebase-debug.log
+
+# mock data (for now)
+allContacts.json
+allFamilies.json

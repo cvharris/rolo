@@ -16,6 +16,6 @@ module.exports = {
   // ],
   // coverageReporters: ['text'],
   testMatch: [
-    '<rootDir>/(tests/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx))'
+    '<rootDir>/(mocks/*.spec.(js|jsx|ts|tsx)|tests/*.spec.(js|jsx|ts|tsx)|**/__tests__/*.(js|jsx|ts|tsx))'
   ]
 }
