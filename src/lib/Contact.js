@@ -1,5 +1,6 @@
 export default class Contact {
   constructor({
+    id = '-1',
     firstName = '',
     lastName = '',
     phoneNumber = '',
@@ -16,6 +17,7 @@ export default class Contact {
     suffix = '',
     dod = null
   }) {
+    this.id = id
     this.firstName = firstName
     this.lastName = lastName
     this.phoneNumber = phoneNumber
@@ -31,5 +33,9 @@ export default class Contact {
     this.prefix = prefix
     this.suffix = suffix
     this.dod = dod
+  }
+
+  toObject() {
+    return Object.assign({}, ...this)
   }
 }

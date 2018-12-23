@@ -1,8 +1,10 @@
-import firebase from 'config/firebase'
-import contactFields from 'lib/contactFields'
-import React, { Component } from 'react'
+import firebase from 'config/firebase';
+import Contact from 'lib/Contact';
+import contactFields from 'lib/contactFields';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
 
-export default class ContactsList extends Component {
+class ContactsList extends Component {
   renderContactRow = field => {
     if (!field) {
       return field
@@ -65,3 +67,9 @@ export default class ContactsList extends Component {
     )
   }
 }
+
+ContactsList.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.instanceOf(Contact))
+}
+
+export default ContactsList

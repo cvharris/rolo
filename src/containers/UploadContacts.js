@@ -1,9 +1,12 @@
-import ContactsList from 'components/ContactsList'
-import firebase, { db } from 'config/firebase'
-import parseUploadedContacts from 'lib/parseUploadedContacts'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import ContactsList from 'components/ContactsList';
+import HowItWorks from 'components/HowItWorks';
+import UploadInstructions from 'components/UploadInstructions';
+import firebase, { db } from 'config/firebase';
+import parseUploadedContacts from 'lib/parseUploadedContacts';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import Contact from 'lib/Contact';
 
 class UploadContacts extends Component {
   state = {
@@ -20,7 +23,7 @@ class UploadContacts extends Component {
     if (uploadedContacts) {
       this.setState({
         ...this.state,
-        uploadedContacts
+        uploadedContacts: uploadedContacts.map(contact => new Contact(contact))
       })
     }
   }
@@ -62,17 +65,6 @@ class UploadContacts extends Component {
     })
     await Promise.all(
       uploadedContacts.map(contact => {
-        const {
-          firstName,
-          lastName,
-          gender,
-          birthday,
-          email,
-          phoneNumber,
-          parents,
-          children,
-          spouse
-        } = contact
         this.setState({
           ...this.state,
           uploadProgress: uploadProgress + 1
@@ -80,17 +72,7 @@ class UploadContacts extends Component {
         return db
           .collection('contacts')
           .doc(contact.id)
-          .set({
-            firstName,
-            lastName,
-            gender,
-            birthday,
-            email,
-            phoneNumber,
-            parents,
-            children,
-            spouse
-          })
+          .set(contact.toObject())
       })
     )
 
@@ -111,7 +93,7 @@ class UploadContacts extends Component {
     })
   }
 
-  onUploadError = (err, reason) => {
+  onUploadError = () => {
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
@@ -178,68 +160,20 @@ class UploadContacts extends Component {
               accept=".csv"
               onChange={e => this.handleUploadedSpreadsheet(e.target.files[0])}
             />
-            <p>All files should have the following headers:</p>
-            <ul>
-              <li>firstName</li>
-              <li>lastName</li>
-              <li>gender</li>
-              <li>birthday</li>
-              <li className="rule-header">
-                So others can use Rolo, include at least one of:
-              </li>
-              <li>phoneNumber</li>
-              <li>email</li>
-              <li className="rule-header">
-                Some of our family members are no longer with us, but you can
-                still include them in the upload, especially in order to
-                establish shared ancestry. You can include their Date of Death
-              </li>
-              <li>dod</li>
-              <li className="rule-header">
-                The following are optional but valid:
-              </li>
-              <li>homeAddressStreet1</li>
-              <li>homeAddressStreet2</li>
-              <li>homeAddressCity</li>
-              <li>homeAddressState</li>
-              <li>homeAddressZip</li>
-              <li>homeAddressCountry</li>
-              <li>maidenName</li>
-              <li>middleName</li>
-              <li>suffix</li>
-              <li>prefix</li>
-              <li className="rule-header">
-                You can automate relating contacts together by including an ID
-                for each contact and adding columns for children, parents, and
-                spouse that contain ids separated by a comma
-              </li>
-              <li>id</li>
-              <li>spouse</li>
-              <li>parents</li>
-              <li>children</li>
-            </ul>
-            <h4>How it Works</h4>
-            <p>
-              Rolo is a family tree and contact app who want to ditch sending
-              spreadsheets around and have contact information integrated with
-              their favorite contact tools automatically. You can upload a list
-              of all contact information of family members and all your family
-              members will have user accounts created for them to access the
-              same list of data.
-            </p>
-            <p>
-              For security reasons all users of Rolo can only see contacts they
-              are related to. A contact is related to another if they share a
-              common ancestor, including through marriage. To calculate this
-              correctly uploaded contacts should include relations to all
-              children, their parents, and their current spouse, if any of these
-              apply.
-            </p>
+            <UploadInstructions />
+            <HowItWorks />
           </div>
         )}
         {uploadedContacts.length > 0 && (
-          <div>
-            <div onClick={this.uploadContacts}>Submit</div>
+          <div className="uploaded">
+            <div className="uploaded-header center measure-wide flex justify-end">
+              <div
+                className="f6 link dim br1 ph3 pv2 mb2 dib white bg-dark-blue"
+                onClick={this.uploadContacts}
+              >
+                Submit
+              </div>
+            </div>
             <ContactsList contacts={uploadedContacts} />
           </div>
         )}
@@ -250,7 +184,7 @@ class UploadContacts extends Component {
 
 export default withRouter(
   connect(
-    state => ({}),
+    (state) => ({}),
     null
   )(UploadContacts)
 )

@@ -1,5 +1,7 @@
 import firebase, { db } from 'config/firebase'
 import Papa from 'papaparse'
+import Contact from 'lib/Contact';
+import consola from 'consola'
 
 export default (file, onStep, onComplete, onError) => {
   // Build the list of uploaded contacts
@@ -9,13 +11,13 @@ export default (file, onStep, onComplete, onError) => {
     docRef = db.collection('contacts').doc()
     contact.clientId = contact.id
     contact.id = docRef.id
-    return contact
+    return new Contact(contact)
   }
 
   const updateExistingContact = (contact, foundContact) => {
     contact.clientId = contact.id
     contact.id = foundContact.id
-    return Object.assign(foundContact, contact)
+    return new Contact(Object.assign(foundContact, contact))
   }
 
   Papa.parse(file, {
@@ -24,7 +26,7 @@ export default (file, onStep, onComplete, onError) => {
     step: async (row, parser) => {
       if (row.errors.length) {
         parser.abort()
-        console.error(row.errors)
+        consola.error(row.errors)
       }
 
       // Pause the parser to wait for async functions to run
@@ -92,7 +94,7 @@ export default (file, onStep, onComplete, onError) => {
       onComplete(contacts)
     },
     error: (err, file, inputEl, reason) => {
-      console.error('err in the upload')
+      consola.error('err in the upload')
       onError(err, reason)
     }
   })
