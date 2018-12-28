@@ -26,7 +26,7 @@ class Rolodex extends Component {
             )}
           />
           <Route path="/new-contact" component={AddContact} />
-          <Route path="/edit-contact/:contactName" component={EditContact} />
+          <Route path="/edit-contact/:contactId" component={EditContact} />
           <Route path="/upload-contacts" component={UploadContacts} />
         </div>
       </div>

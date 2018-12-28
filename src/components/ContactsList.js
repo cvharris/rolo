@@ -2,6 +2,7 @@ import firebase from 'config/firebase';
 import Contact from 'lib/Contact';
 import contactFields from 'lib/contactFields';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'
 import React, { Component } from 'react';
 
 class ContactsList extends Component {
@@ -44,7 +45,7 @@ class ContactsList extends Component {
         </div>
         <div className="rolo-table-body">
           {contacts.map(contact => (
-            <div
+            <Link
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
               key={contact.id}
               style={{
@@ -52,6 +53,7 @@ class ContactsList extends Component {
                   Object.keys(contactFields).length
                 }, 1fr)`
               }}
+              to={`/edit-contact/${contact.id}`}
             >
               {Object.keys(contactFields).map((field, i) => (
                 <div className="contact-col pl3 flex-auto" key={i}>
@@ -60,7 +62,7 @@ class ContactsList extends Component {
                   </span>
                 </div>
               ))}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
