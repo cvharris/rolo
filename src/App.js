@@ -23,6 +23,7 @@ export default class RoloApp extends Component {
   }
 
   handleUserLogin = async loggedInUser => {
+    console.log(loggedInUser)
     if (loggedInUser) {
       // User is signed in.
       const user = await firebase

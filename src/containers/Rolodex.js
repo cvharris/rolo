@@ -14,7 +14,7 @@ class Rolodex extends Component {
     return (
       <div>
         <Sidebar />
-        <div>
+        <div className="app-body">
           <Route
             exact
             path="/"

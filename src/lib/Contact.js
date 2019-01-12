@@ -1,4 +1,5 @@
 export default class Contact {
+  // TODO: check if firebase timestamp, convert to Date
   constructor({
     id = '-1',
     firstName = '',
@@ -36,6 +37,7 @@ export default class Contact {
   }
 
   toObject() {
+    // TODO: Convert dates to Firestore Timestamps
     return Object.assign({}, ...this)
   }
 }
