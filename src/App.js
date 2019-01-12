@@ -19,40 +19,59 @@ export default class RoloApp extends Component {
   componentDidMount() {
     // Try to fetch user record
     // If unauthenticated, show login screen
-    firebase
-      .firestore()
-      .collection('contacts')
-      .get()
-      .then(snapshot => {
-        const refCleaned = snapshot.docs.map(doc => {
-          const temp = { ...doc.data(), id: doc.id }
-          const contact = {}
-          Object.keys(temp).forEach(key => {
-            contact[key] =
-              temp[key] instanceof firebase.firestore.DocumentReference
-                ? temp[key].id
-                : temp[key]
-          })
-          return contact
-        })
-        const normalized = normalize(
-          {
-            contacts: refCleaned
-          },
-          schema
+    firebase.auth().onAuthStateChanged(this.handleUserLogin)
+  }
+
+  handleUserLogin = async loggedInUser => {
+    console.log(loggedInUser)
+    if (loggedInUser) {
+      // User is signed in.
+      const user = await firebase
+        .firestore()
+        .collection('users')
+        .doc(loggedInUser.uid)
+        .get()
+
+      const relatives = await Promise.all(
+        user.get('relatives').map(relativeRef =>
+          firebase
+            .firestore()
+            .doc(relativeRef.path)
+            .get()
         )
-        const mappedStore = {
-          contacts: {
-            allIds: normalized.result.contacts,
-            byId: normalized.entities.contacts
-          }
-        }
-        console.log(mappedStore)
-        this.setState({
-          store: configureStore(mappedStore),
-          isStoreLoading: false
+      )
+      const refCleaned = relatives.map(doc => {
+        const temp = { ...doc.data(), id: doc.id }
+        const contact = {}
+        Object.keys(temp).forEach(key => {
+          contact[key] =
+            temp[key] instanceof firebase.firestore.DocumentReference
+              ? temp[key].id
+              : temp[key]
         })
+        return contact
       })
+      const normalized = normalize(
+        {
+          contacts: refCleaned
+        },
+        schema
+      )
+      // convertFirestoreToJSON(normalized)
+      const mappedStore = {
+        contacts: {
+          allIds: normalized.result.contacts,
+          byId: normalized.entities.contacts
+        }
+      }
+
+      this.setState({
+        store: configureStore(mappedStore),
+        isStoreLoading: false
+      })
+    } else {
+      // No user is signed in.
+    }
   }
 
   render() {

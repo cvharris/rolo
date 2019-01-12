@@ -1,8 +1,25 @@
-import firebase from 'config/firebase'
-import contactFields from 'lib/contactFields'
-import React, { Component } from 'react'
+import firebase from 'config/firebase';
+import Contact from 'lib/Contact';
+import contactFields from 'lib/contactFields';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'
+import React, { Component } from 'react';
 
-export default class ContactsList extends Component {
+class ContactsList extends Component {
+  renderContactRow = field => {
+    if (!field) {
+      return field
+    }
+    switch (field.constructor) {
+      case firebase.firestore.Timestamp:
+        return field.toDate().toDateString()
+      case Array:
+        return field.join(', ')
+      default:
+        return field
+    }
+  }
+
   render() {
     const { contacts } = this.props
 
@@ -27,8 +44,8 @@ export default class ContactsList extends Component {
           ))}
         </div>
         <div className="rolo-table-body">
-          {contacts.map((contact, i) => (
-            <div
+          {contacts.map(contact => (
+            <Link
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
               key={contact.id}
               style={{
@@ -36,20 +53,25 @@ export default class ContactsList extends Component {
                   Object.keys(contactFields).length
                 }, 1fr)`
               }}
+              to={`/edit-contact/${contact.id}`}
             >
-              {Object.keys(contactFields).map((key, j) => (
-                <div className="contact-col pl3 flex-auto" key={j}>
+              {Object.keys(contactFields).map((field, i) => (
+                <div className="contact-col pl3 flex-auto" key={i}>
                   <span className="f6 db black-70">
-                    {contact[key] instanceof firebase.firestore.Timestamp
-                      ? contact[key].toDate().toDateString()
-                      : contact[key]}
+                    {this.renderContactRow(contact[field])}
                   </span>
                 </div>
               ))}
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     )
   }
 }
+
+ContactsList.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.instanceOf(Contact))
+}
+
+export default ContactsList
