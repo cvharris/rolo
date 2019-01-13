@@ -30,7 +30,9 @@ export default class RoloApp extends Component {
   }
 
   // TODO: Potentially create a context for handling logout instead
-  handleUserLogout = () => {
+  // TODO: Don't reset store when logging out
+  handleUserLogout = async () => {
+    await firebase.auth().signOut()
     this.setState({
       loadingFirebaseSession: false,
       isAuthenticated: false

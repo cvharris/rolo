@@ -56,7 +56,7 @@ class Rolodex extends Component {
   render() {
     return (
       <div>
-        <Sidebar />
+        <Sidebar handleLogout={this.props.handleLogout} />
         <div className="app-body">
           <Route
             exact
