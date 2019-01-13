@@ -1,9 +1,13 @@
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faSpinner } from '@fortawesome/pro-regular-svg-icons'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import './App.css'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
+
+library.add(faSpinner)
 
 ReactDOM.render(<App />, document.getElementById('root'))
 

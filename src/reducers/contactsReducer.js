@@ -1,9 +1,5 @@
-import {
-  ADD_CONTACT,
-  REMOVE_CONTACT,
-  UPDATE_CONTACT
-} from '../config/constants'
-import { createSelector } from 'reselect'
+import { createSelector } from 'reselect';
+import { ADD_CONTACT, REMOVE_CONTACT, SET_USER_CONTACTS, UPDATE_CONTACT } from '../config/constants';
 
 // Initial State
 export const initialState = {
@@ -14,6 +10,8 @@ export const initialState = {
 // Reducer
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SET_USER_CONTACTS:
+      return action.contacts
     case ADD_CONTACT:
       return {
         allIds: [...state.allIds, action.newContact.id],

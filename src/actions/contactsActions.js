@@ -1,9 +1,15 @@
 import {
   ADD_CONTACT,
   REMOVE_CONTACT,
+  SET_USER_CONTACTS,
   UPDATE_CONTACT
 } from '../config/constants'
 import firebase from '../config/firebase'
+
+export const setUserContacts = contacts => ({
+  type: SET_USER_CONTACTS,
+  contacts
+})
 
 export const pushContact = newContact => {
   return dispatch => {
