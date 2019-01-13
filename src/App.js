@@ -1,11 +1,8 @@
-import configureStore from 'config/store';
-import React, { Component } from 'react';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import LoadingScreen from './components/LoadingScreen';
-import firebase from './config/firebase';
-import Login from './containers/Login';
-import Rolodex from './containers/Rolodex';
+import React, { Component } from 'react'
+import LoadingScreen from './components/LoadingScreen'
+import firebase from './config/firebase'
+import Login from './containers/Login'
+import Rolodex from './containers/Rolodex'
 
 export default class RoloApp extends Component {
   constructor(props) {
@@ -30,7 +27,6 @@ export default class RoloApp extends Component {
   }
 
   // TODO: Potentially create a context for handling logout instead
-  // TODO: Don't reset store when logging out
   handleUserLogout = async () => {
     await firebase.auth().signOut()
     this.setState({
@@ -50,12 +46,6 @@ export default class RoloApp extends Component {
       return <Login handleLogin={this.handleUserLogin} />
     }
 
-    return (
-      <Provider store={configureStore()}>
-        <BrowserRouter>
-          <Rolodex handleLogout={this.handleUserLogout} />
-        </BrowserRouter>
-      </Provider>
-    )
+    return <Rolodex handleLogout={this.handleUserLogout} />
   }
 }
