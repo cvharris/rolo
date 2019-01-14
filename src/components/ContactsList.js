@@ -1,23 +1,12 @@
-import firebase from 'config/firebase';
-import Contact from 'lib/Contact';
-import contactFields from 'lib/contactFields';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom'
-import React, { Component } from 'react';
+import Contact from 'lib/Contact'
+import contactFields from 'lib/contactFields'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+import ContactRow from './ContactRow'
 
 class ContactsList extends Component {
-  renderContactRow = field => {
-    if (!field) {
-      return field
-    }
-    switch (field.constructor) {
-      case firebase.firestore.Timestamp:
-        return field.toDate().toDateString()
-      case Array:
-        return field.join(', ')
-      default:
-        return field
-    }
+  updateContact = (field, val) => {
+    console.log(field, val)
   }
 
   render() {
@@ -29,14 +18,8 @@ class ContactsList extends Component {
 
     return (
       <div className="rolo-table">
-        <div
-          className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline"
-          style={{
-            gridTemplateColumns: `repeat(${
-              Object.keys(contactFields).length
-            }, 1fr)`
-          }}
-        >
+        <div className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline">
+          <div className="header-col" />
           {Object.values(contactFields).map((header, i) => (
             <div className="header-col" key={i}>
               {header}
@@ -45,24 +28,11 @@ class ContactsList extends Component {
         </div>
         <div className="rolo-table-body">
           {contacts.map(contact => (
-            <Link
-              className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
+            <ContactRow
+              contact={contact}
               key={contact.id}
-              style={{
-                gridTemplateColumns: `repeat(${
-                  Object.keys(contactFields).length
-                }, 1fr)`
-              }}
-              to={`/edit-contact/${contact.id}`}
-            >
-              {Object.keys(contactFields).map((field, i) => (
-                <div className="contact-col pl3 flex-auto" key={i}>
-                  <span className="f6 db black-70">
-                    {this.renderContactRow(contact[field])}
-                  </span>
-                </div>
-              ))}
-            </Link>
+              updateContact={this.updateContact}
+            />
           ))}
         </div>
       </div>

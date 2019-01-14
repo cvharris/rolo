@@ -31,10 +31,13 @@ class Rolodex extends Component {
       const temp = { ...doc.data(), id: doc.id }
       const contact = {}
       Object.keys(temp).forEach(key => {
-        contact[key] =
-          temp[key] instanceof firebase.firestore.DocumentReference
-            ? temp[key].id
-            : temp[key]
+        if (key === 'spouse') {
+          contact[key] = temp[key] ? temp[key].id : null
+        } else if (key === 'parents' || key === 'children') {
+          contact[key] = temp[key].map(ref => ref.id)
+        } else {
+          contact[key] = temp[key]
+        }
       })
       return contact
     })

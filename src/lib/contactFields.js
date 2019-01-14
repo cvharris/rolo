@@ -5,7 +5,7 @@ export default {
   gender: 'M/F',
   phoneNumber: 'Phone Number',
   email: 'Email Address',
-  address: 'Home Address',
+  // address: 'Home Address',
   birthday: 'Birthday',
   dod: 'Date of Death',
   spouse: 'Spouse',
