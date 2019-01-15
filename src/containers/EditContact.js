@@ -10,10 +10,9 @@ class EditContact extends Component {
   }
 
   componentDidMount() {
-    this.props.setCurrentContact(
-      this.props.allContactsById[this.props.match.params.contactId],
-      this.props.allContactsById
-    )
+    const { setCurrentContact, allContactsById, match } = this.props
+
+    setCurrentContact(allContactsById[match.params.contactId], allContactsById)
     this.setState({
       fetchingContact: false
     })

@@ -9,7 +9,7 @@ import ContactCellSelect from './ContactCellSelect'
 
 const ContactRow = ({ contact, updateContact }) => (
   <div className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc">
-    <Link to={`/edit-contact/${contact.id}`}>
+    <Link to={`/edit-contact/${contact.id}`} style={{ padding: '0 1rem' }}>
       <FontAwesomeIcon icon={['far', 'edit']} />
     </Link>
     <ContactCell

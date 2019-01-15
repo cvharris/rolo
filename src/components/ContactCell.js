@@ -15,6 +15,15 @@ class ContactCell extends Component {
     })
   }
 
+  cancelEditing = () => {
+    const { newValue } = this.state
+
+    this.setState({
+      updating: false,
+      newValue
+    })
+  }
+
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
@@ -39,10 +48,14 @@ class ContactCell extends Component {
 
     if (updating) {
       return (
-        <span className="contact-col pl3 flex-auto f6 black-70">
+        <span
+          className="contact-col pl3 flex-auto f6 black-70"
+          onClick={this.cancelEditing}
+        >
           <input
+            onClick={e => e.stopPropagation()}
             value={newValue}
-            onBlur={this.saveEditedValue}
+            onBlur={this.cancelEditing}
             onChange={this.updateValue}
             onKeyUp={e => (e.key === 'Enter' ? this.saveEditedValue : null)}
           />
@@ -53,7 +66,7 @@ class ContactCell extends Component {
     return (
       <span
         onClick={this.switchToEdit}
-        className="contact-col pl3 flex-auto f6 black-70"
+        className="contact-col pl3 flex-auto f6 pointer black-70"
       >
         {field}
       </span>

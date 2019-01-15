@@ -1,3 +1,5 @@
+import LoadingScreen from 'components/LoadingScreen'
+import Contact from 'lib/Contact'
 import { normalize } from 'normalizr'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -19,44 +21,58 @@ class Rolodex extends Component {
 
   async componentDidMount() {
     const { updateContactsList } = this.props
-    const user = await db
-      .collection('users')
-      .doc(firebase.auth().currentUser.uid) // TODO: convert this to a reducer of the current user
-      .get()
+    try {
+      const user = await db
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid) // TODO: convert this to a reducer of the current user
+        .get()
 
-    const relatives = await Promise.all(
-      user.get('relatives').map(relativeRef => db.doc(relativeRef.path).get())
-    )
-    const refCleaned = relatives.map(doc => {
-      const temp = { ...doc.data(), id: doc.id }
-      const contact = {}
-      Object.keys(temp).forEach(key => {
-        if (key === 'spouse') {
-          contact[key] = temp[key] ? temp[key].id : null
-        } else if (key === 'parents' || key === 'children') {
-          contact[key] = temp[key].map(ref => ref.id)
-        } else {
-          contact[key] = temp[key]
-        }
+      const relatives = await Promise.all(
+        user.get('relatives').map(relativeRef => db.doc(relativeRef.path).get())
+      )
+      const refCleaned = relatives.map(doc => {
+        const temp = { ...doc.data(), id: doc.id }
+        const contact = {}
+        Object.keys(temp).forEach(key => {
+          if (key === 'spouse') {
+            contact[key] = temp[key] ? temp[key].id : null
+          } else if (key === 'parents' || key === 'children') {
+            contact[key] = temp[key].map(ref => ref.id)
+          } else {
+            contact[key] = temp[key]
+          }
+        })
+        return contact
       })
-      return contact
-    })
-    const normalized = normalize(
-      {
-        contacts: refCleaned
-      },
-      schema
-    )
-    // convertFirestoreToJSON(normalized)
-    const mappedStore = {
-      allIds: normalized.result.contacts,
-      byId: normalized.entities.contacts
+      const normalized = normalize(
+        {
+          contacts: refCleaned
+        },
+        schema
+      )
+      // convertFirestoreToJSON(normalized)
+      const mappedStore = {
+        allIds: normalized.result.contacts,
+        byId: normalized.entities.contacts
+      }
+      // Update state with this (not resetting store)
+      updateContactsList(mappedStore)
+    } catch (e) {
+      // TODO: Show loading error message
     }
-    // Update state with this (not resetting store)
-    updateContactsList(mappedStore)
+
+    this.setState({
+      loadingContacts: false
+    })
   }
 
   render() {
+    const { loadingContacts } = this.state
+
+    if (loadingContacts) {
+      return <LoadingScreen />
+    }
+
     return (
       <div>
         <Sidebar handleLogout={this.props.handleLogout} />
@@ -92,7 +108,9 @@ const mapDispatchToProps = dispatch => {
 export default withRouter(
   connect(
     state => ({
-      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId])
+      contacts: state.contacts.allIds.map(
+        cId => new Contact(state.contacts.byId[cId])
+      )
     }),
     mapDispatchToProps
   )(Rolodex)

@@ -18,6 +18,15 @@ class ContactCellSelect extends Component {
     })
   }
 
+  cancelEditing = () => {
+    const { newValue } = this.state
+
+    this.setState({
+      updating: false,
+      newValue
+    })
+  }
+
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
@@ -58,7 +67,7 @@ class ContactCellSelect extends Component {
 }
 
 ContactCellSelect.propTypes = {
-  field: PropTypes.string.isRequired,
+  field: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   multiSelect: PropTypes.bool,
   options: PropTypes.array,
   onFieldChange: PropTypes.func.isRequired
