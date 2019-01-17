@@ -1,42 +1,13 @@
 import { db } from 'config/firebase'
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import { getTypeAheadOptions } from 'reducers/contactsReducer'
 import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer'
+import ContactCell from './ContactCell'
 
-class ContactCellSelect extends Component {
-  state = {
-    updating: false,
-    newValue: ''
-  }
-
-  constructor(props) {
-    super(props)
-    this.selectList = React.createRef()
-  }
-
-  switchToEdit = () => {
-    const { value } = this.props
-    this.setState(
-      {
-        updating: true,
-        newValue: value
-      },
-      () => this.selectList.current.focus()
-    )
-  }
-
-  cancelEditing = () => {
-    const { newValue } = this.state
-
-    this.setState({
-      updating: false,
-      newValue
-    })
-  }
-
+class ContactCellSelect extends ContactCell {
   createContactRef = id => db.doc(`contacts/${id}`)
 
   saveEditedValue = option => {
@@ -44,7 +15,7 @@ class ContactCellSelect extends Component {
 
     onFieldChange(
       options
-        ? option
+        ? option.value
         : multiSelect
         ? option
           ? option.map(opt => this.createContactRef(opt.value))
@@ -53,10 +24,7 @@ class ContactCellSelect extends Component {
         ? this.createContactRef(option.value)
         : null
     )
-    this.setState({
-      updating: true,
-      newValue: option
-    })
+    this.updateValue(option)
   }
 
   render() {
@@ -71,7 +39,7 @@ class ContactCellSelect extends Component {
             blurInputOnSelect={false}
             closeMenuOnSelect={false}
             isClearable={!options}
-            ref={this.selectList}
+            ref={this.inputRef}
             value={newValue}
             onKeyDown={e => (e.key === 'Enter' ? this.cancelEditing() : null)}
             onChange={option => this.saveEditedValue(option)}

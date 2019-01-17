@@ -9,7 +9,7 @@ import {
   setUserContacts,
   updateContact as editContactInfo
 } from '../actions/contactsActions'
-import ContactsList from '../components/ContactsList'
+import ContactsList from '../components/ContactsTable/ContactsList'
 import firebase, { db } from '../config/firebase'
 import AddContact from './AddContact'
 import EditContact from './EditContact'
@@ -61,7 +61,7 @@ class Rolodex extends Component {
     }
 
     return (
-      <div>
+      <div id="app">
         <Sidebar handleLogout={handleLogout} />
         <div className="app-body">
           <Route

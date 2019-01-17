@@ -1,53 +1,14 @@
 import PropTypes from 'prop-types'
-import React, { Component } from 'react'
+import React from 'react'
+import ContactCell from './ContactCell'
 
-class ContactCell extends Component {
-  state = {
-    updating: false,
-    newValue: ''
-  }
-
-  constructor(props) {
-    super(props)
-    this.inputRef = React.createRef()
-  }
-
-  switchToEdit = () => {
-    const { field } = this.props
-    this.setState(
-      {
-        updating: true,
-        newValue: field
-      },
-      () => this.inputRef.current.focus()
-    )
-  }
-
-  cancelEditing = () => {
-    const { newValue } = this.state
-
-    this.setState({
-      updating: false,
-      newValue
-    })
-  }
-
+class ContactCellText extends ContactCell {
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
 
     onFieldChange(newValue)
-    this.setState({
-      updating: false,
-      newValue
-    })
-  }
-
-  updateValue = e => {
-    this.setState({
-      updating: true,
-      newValue: e.target.value
-    })
+    this.cancelEditing()
   }
 
   render() {
@@ -65,7 +26,7 @@ class ContactCell extends Component {
             value={newValue}
             ref={this.inputRef}
             onBlur={this.cancelEditing}
-            onChange={this.updateValue}
+            onChange={e => this.updateValue(e.target.value)}
             onKeyUp={e => (e.key === 'Enter' ? this.saveEditedValue() : null)}
           />
         </span>
@@ -83,13 +44,13 @@ class ContactCell extends Component {
   }
 }
 
-ContactCell.propTypes = {
+ContactCellText.propTypes = {
   field: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired
 }
 
-ContactCell.defaultProps = {
+ContactCellText.defaultProps = {
   field: ''
 }
 
-export default ContactCell
+export default ContactCellText

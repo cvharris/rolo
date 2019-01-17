@@ -1,12 +1,12 @@
-import ContactsList from 'components/ContactsList';
-import HowItWorks from 'components/HowItWorks';
-import UploadInstructions from 'components/UploadInstructions';
-import firebase, { db } from 'config/firebase';
-import parseUploadedContacts from 'lib/parseUploadedContacts';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import Contact from 'lib/Contact';
+import ContactsList from 'components/ContactsTable/ContactsList'
+import HowItWorks from 'components/HowItWorks'
+import UploadInstructions from 'components/UploadInstructions'
+import firebase, { db } from 'config/firebase'
+import Contact from 'lib/Contact'
+import parseUploadedContacts from 'lib/parseUploadedContacts'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
 class UploadContacts extends Component {
   state = {
@@ -184,7 +184,7 @@ class UploadContacts extends Component {
 
 export default withRouter(
   connect(
-    (state) => ({}),
+    state => ({}),
     null
   )(UploadContacts)
 )
