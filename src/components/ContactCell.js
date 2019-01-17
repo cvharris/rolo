@@ -7,12 +7,20 @@ class ContactCell extends Component {
     newValue: ''
   }
 
+  constructor(props) {
+    super(props)
+    this.inputRef = React.createRef()
+  }
+
   switchToEdit = () => {
     const { field } = this.props
-    this.setState({
-      updating: true,
-      newValue: field
-    })
+    this.setState(
+      {
+        updating: true,
+        newValue: field
+      },
+      () => this.inputRef.current.focus()
+    )
   }
 
   cancelEditing = () => {
@@ -55,9 +63,10 @@ class ContactCell extends Component {
           <input
             onClick={e => e.stopPropagation()}
             value={newValue}
+            ref={this.inputRef}
             onBlur={this.cancelEditing}
             onChange={this.updateValue}
-            onKeyUp={e => (e.key === 'Enter' ? this.saveEditedValue : null)}
+            onKeyUp={e => (e.key === 'Enter' ? this.saveEditedValue() : null)}
           />
         </span>
       )
@@ -75,8 +84,12 @@ class ContactCell extends Component {
 }
 
 ContactCell.propTypes = {
-  field: PropTypes.string.isRequired,
+  field: PropTypes.string,
   onFieldChange: PropTypes.func.isRequired
+}
+
+ContactCell.defaultProps = {
+  field: ''
 }
 
 export default ContactCell

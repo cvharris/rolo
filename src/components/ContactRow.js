@@ -1,11 +1,11 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import firebase from 'config/firebase'
-import Contact from 'lib/Contact'
-import PropTypes from 'prop-types'
-import React from 'react'
-import { Link } from 'react-router-dom'
-import ContactCell from './ContactCell'
-import ContactCellSelect from './ContactCellSelect'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import firebase from 'config/firebase';
+import Contact from 'lib/Contact';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import ContactCell from './ContactCell';
+import ContactCellSelect from './ContactCellSelect';
 
 const ContactRow = ({ contact, updateContact }) => (
   <div className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc">
@@ -25,7 +25,7 @@ const ContactRow = ({ contact, updateContact }) => (
       onFieldChange={val => updateContact('lastName', val)}
     />
     <ContactCellSelect
-      field={contact.gender}
+      field={contact.gender || ''}
       options={[{ label: 'Male', value: 'M' }, { label: 'Female', value: 'F' }]}
       onFieldChange={val => updateContact('gender', val)}
     />
@@ -56,16 +56,16 @@ const ContactRow = ({ contact, updateContact }) => (
       }
     />
     <ContactCellSelect
-      field={contact.spouse}
+      field={contact.spouse || ''}
       onFieldChange={val => updateContact('spouse', val)}
     />
     <ContactCellSelect
-      field={contact.parents}
+      field={contact.parents || []}
       multiSelect={true}
       onFieldChange={val => updateContact('parents', val)}
     />
     <ContactCellSelect
-      field={contact.children}
+      field={contact.children || []}
       multiSelect={true}
       onFieldChange={val => updateContact('children', val)}
     />

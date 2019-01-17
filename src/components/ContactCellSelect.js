@@ -1,8 +1,10 @@
+import { db } from 'config/firebase'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import { getTypeAheadOptions } from 'reducers/contactsReducer'
+import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer'
 
 class ContactCellSelect extends Component {
   state = {
@@ -10,12 +12,20 @@ class ContactCellSelect extends Component {
     newValue: ''
   }
 
+  constructor(props) {
+    super(props)
+    this.selectList = React.createRef()
+  }
+
   switchToEdit = () => {
-    const { field } = this.props
-    this.setState({
-      updating: true,
-      newValue: field
-    })
+    const { value } = this.props
+    this.setState(
+      {
+        updating: true,
+        newValue: value
+      },
+      () => this.selectList.current.focus()
+    )
   }
 
   cancelEditing = () => {
@@ -27,28 +37,45 @@ class ContactCellSelect extends Component {
     })
   }
 
-  saveEditedValue = () => {
-    const { newValue } = this.state
-    const { onFieldChange } = this.props
+  createContactRef = id => db.doc(`contacts/${id}`)
 
-    onFieldChange(newValue)
+  saveEditedValue = option => {
+    const { onFieldChange, options, multiSelect } = this.props
+
+    onFieldChange(
+      options
+        ? option
+        : multiSelect
+        ? option
+          ? option.map(opt => this.createContactRef(opt.value))
+          : []
+        : option
+        ? this.createContactRef(option.value)
+        : null
+    )
     this.setState({
-      updating: false,
-      newValue
+      updating: true,
+      newValue: option
     })
   }
 
   render() {
     const { updating, newValue } = this.state
-    const { field, typeAheadOptions, multiSelect } = this.props
+    const { value, typeAheadOptions, multiSelect, options } = this.props
 
     if (updating) {
       return (
         <span className="contact-col pl3 flex-auto f6 black-70">
           <Select
             options={typeAheadOptions}
+            blurInputOnSelect={false}
+            closeMenuOnSelect={false}
+            isClearable={!options}
+            ref={this.selectList}
             value={newValue}
+            onKeyDown={e => (e.key === 'Enter' ? this.cancelEditing() : null)}
             onChange={option => this.saveEditedValue(option)}
+            onBlur={this.cancelEditing}
             isMulti={multiSelect}
           />
         </span>
@@ -60,7 +87,11 @@ class ContactCellSelect extends Component {
         onClick={this.switchToEdit}
         className="contact-col pointer underline-hover pl3 flex-auto f6 black-70"
       >
-        {multiSelect ? field.join(', ') : field}
+        {options
+          ? value
+          : multiSelect
+          ? value.map(fi => fi.label).join(', ')
+          : value.label}
       </span>
     )
   }
@@ -79,5 +110,12 @@ ContactCellSelect.defaultProps = {
 }
 
 export default connect((state, ownProps) => ({
+  value: ownProps.options
+    ? ownProps.field
+    : ownProps.multiSelect
+    ? ownProps.field.map(doc =>
+        mapRefToTypeAheadOption(doc, state.contacts.byId)
+      )
+    : mapRefToTypeAheadOption(ownProps.field, state.contacts.byId),
   typeAheadOptions: ownProps.options || getTypeAheadOptions(state)
 }))(ContactCellSelect)

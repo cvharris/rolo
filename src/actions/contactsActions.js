@@ -4,7 +4,7 @@ import {
   SET_USER_CONTACTS,
   UPDATE_CONTACT
 } from '../config/constants'
-import firebase from '../config/firebase'
+import firebase, { db } from '../config/firebase'
 
 export const setUserContacts = contacts => ({
   type: SET_USER_CONTACTS,
@@ -32,10 +32,20 @@ export const addContact = newContact => ({
   newContact
 })
 
-export const updateContact = contact => ({
-  type: UPDATE_CONTACT,
-  contact
-})
+export const updateContact = contact => {
+  return dispatch => {
+    return db
+      .collection('contacts')
+      .doc(contact.id)
+      .set(contact.toObject())
+      .then(doc =>
+        dispatch({
+          type: UPDATE_CONTACT,
+          contact
+        })
+      )
+  }
+}
 
 export const removeContact = contact => ({
   type: REMOVE_CONTACT,
