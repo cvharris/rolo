@@ -1,6 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAddressBook,
+  faEdit,
   faListUl,
   faPlus,
   faSignOut,
@@ -17,7 +18,15 @@ import './App.css'
 import './index.css'
 import * as serviceWorker from './serviceWorker'
 
-library.add(faSpinner, faAddressBook, faUpload, faListUl, faPlus, faSignOut)
+library.add(
+  faSpinner,
+  faAddressBook,
+  faUpload,
+  faListUl,
+  faPlus,
+  faSignOut,
+  faEdit
+)
 
 ReactDOM.render(
   <Provider store={configureStore()}>

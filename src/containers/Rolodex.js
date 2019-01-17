@@ -1,12 +1,16 @@
-import { normalize } from 'normalizr'
+import LoadingScreen from 'components/LoadingScreen'
+import Contact from 'lib/Contact'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Route } from 'react-router'
 import { withRouter } from 'react-router-dom'
-import { removeContact, setUserContacts } from '../actions/contactsActions'
+import {
+  removeContact,
+  setUserContacts,
+  updateContact as editContactInfo
+} from '../actions/contactsActions'
 import ContactsList from '../components/ContactsList'
 import firebase, { db } from '../config/firebase'
-import schema from '../config/schema'
 import AddContact from './AddContact'
 import EditContact from './EditContact'
 import Sidebar from './Sidebar'
@@ -19,52 +23,55 @@ class Rolodex extends Component {
 
   async componentDidMount() {
     const { updateContactsList } = this.props
-    const user = await db
-      .collection('users')
-      .doc(firebase.auth().currentUser.uid) // TODO: convert this to a reducer of the current user
-      .get()
+    try {
+      const user = await db
+        .collection('users')
+        .doc(firebase.auth().currentUser.uid) // TODO: convert this to a reducer of the current user
+        .get()
 
-    const relatives = await Promise.all(
-      user.get('relatives').map(relativeRef => db.doc(relativeRef.path).get())
-    )
-    const refCleaned = relatives.map(doc => {
-      const temp = { ...doc.data(), id: doc.id }
-      const contact = {}
-      Object.keys(temp).forEach(key => {
-        contact[key] =
-          temp[key] instanceof firebase.firestore.DocumentReference
-            ? temp[key].id
-            : temp[key]
-      })
-      return contact
-    })
-    const normalized = normalize(
-      {
-        contacts: refCleaned
-      },
-      schema
-    )
-    // convertFirestoreToJSON(normalized)
-    const mappedStore = {
-      allIds: normalized.result.contacts,
-      byId: normalized.entities.contacts
+      const relatives = await Promise.all(
+        user.get('relatives').map(relativeRef => db.doc(relativeRef.path).get())
+      )
+      const contacts = relatives.reduce(
+        (newState, doc) => {
+          const contact = new Contact({ ...doc.data(), id: doc.id })
+          newState.byId[contact.id] = contact
+          newState.allIds.push(contact.id)
+          return newState
+        },
+        { allIds: [], byId: {} }
+      )
+      // Update state with this (not resetting store)
+      updateContactsList(contacts)
+    } catch (e) {
+      // TODO: Show loading error message
     }
-    // Update state with this (not resetting store)
-    updateContactsList(mappedStore)
+
+    this.setState({
+      loadingContacts: false
+    })
   }
 
   render() {
+    const { loadingContacts } = this.state
+    const { handleLogout, contacts, removeContact, updateContact } = this.props
+
+    if (loadingContacts) {
+      return <LoadingScreen />
+    }
+
     return (
       <div>
-        <Sidebar handleLogout={this.props.handleLogout} />
+        <Sidebar handleLogout={handleLogout} />
         <div className="app-body">
           <Route
             exact
             path="/"
             render={() => (
               <ContactsList
-                contacts={this.props.contacts}
-                onRemoveContact={this.props.removeContact}
+                contacts={contacts}
+                onRemoveContact={removeContact}
+                updateContact={updateContact}
               />
             )}
           />
@@ -77,20 +84,15 @@ class Rolodex extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateContactsList: mappedStore => dispatch(setUserContacts(mappedStore)),
-    removeContact: contact => {
-      dispatch(removeContact(contact))
-    }
-  }
-}
-
 export default withRouter(
   connect(
     state => ({
       contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId])
     }),
-    mapDispatchToProps
+    {
+      updateContactsList: setUserContacts,
+      updateContact: editContactInfo,
+      removeContact
+    }
   )(Rolodex)
 )

@@ -227,7 +227,7 @@ class ContactForm extends Component {
 ContactForm.propTypes = {
   contact: PropTypes.instanceOf(Contact),
   onContactSubmit: PropTypes.func,
-  typeAheadOptions: PropTypes.object
+  typeAheadOptions: PropTypes.array
 }
 
 export default connect(state => ({

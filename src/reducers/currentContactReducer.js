@@ -1,15 +1,26 @@
 import {
   ADD_CONTACT,
-  UPDATE_CURRENT_CONTACT,
-  SET_CURRENT_CONTACT
+  SET_CURRENT_CONTACT,
+  UPDATE_CURRENT_CONTACT
 } from '../config/constants'
 import Contact from '../lib/Contact'
 
-const mapRefToTypeAheadOption = (doc, allContactsById) => {
+export const mapRefToTypeAheadOption = (doc, allContactsById) => {
   if (!doc) {
-    return doc
+    return {
+      value: '',
+      label: ''
+    }
   }
+
   const contact = allContactsById[doc.id]
+  if (!contact) {
+    // TODO: This is a bug! The mapping of relatives should have added this contact!
+    return {
+      value: doc.id,
+      label: 'Not Found!'
+    }
+  }
   return {
     value: doc.id,
     label: `${contact.firstName} ${contact.lastName}`

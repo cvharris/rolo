@@ -1,4 +1,3 @@
-import Contact from 'lib/Contact'
 import { createSelector } from 'reselect'
 import {
   ADD_CONTACT,
@@ -41,9 +40,7 @@ export default (state = initialState, action) => {
 
 // Getters
 const allContactsSelector = state =>
-  state.contacts.allIds.map(
-    contactId => new Contact(state.contacts.byId[contactId])
-  )
+  state.contacts.allIds.map(contactId => state.contacts.byId[contactId])
 
 export const getTypeAheadOptions = createSelector(
   allContactsSelector,
