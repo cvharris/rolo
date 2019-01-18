@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 class ContactCell extends Component {
   state = {
     updating: false,
+    value: '',
     newValue: ''
   }
 
@@ -12,11 +13,12 @@ class ContactCell extends Component {
   }
 
   switchToEdit = () => {
-    const { value, field } = this.props
+    const { value } = this.props
     this.setState(
       {
         updating: true,
-        newValue: value || field
+        value,
+        newValue: value
       },
       () => this.inputRef.current.focus()
     )
@@ -25,15 +27,17 @@ class ContactCell extends Component {
   updateValue = newValue => {
     this.setState({
       updating: true,
+      value: newValue,
       newValue
     })
   }
 
   cancelEditing = () => {
-    const { newValue } = this.state
+    const { value, newValue } = this.state
 
     this.setState({
       updating: false,
+      value,
       newValue
     })
   }

@@ -1,20 +1,31 @@
-import { db } from 'config/firebase'
-import PropTypes from 'prop-types'
-import React from 'react'
-import { connect } from 'react-redux'
-import Select from 'react-select'
-import { getTypeAheadOptions } from 'reducers/contactsReducer'
-import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer'
-import ContactCell from './ContactCell'
+import { db } from 'config/firebase';
+import PropTypes from 'prop-types';
+import React from 'react';
+import Select from 'react-select';
+import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer';
+import ContactCell from './ContactCell';
 
 class ContactCellSelect extends ContactCell {
+  static getDerivedStateFromProps(props, state) {
+    return {
+      ...state,
+      value: !props.isContactSelect
+        ? props.field
+        : props.multiSelect
+        ? props.field.map(doc =>
+            mapRefToTypeAheadOption(doc, props.contactsMap)
+          )
+        : mapRefToTypeAheadOption(props.field, props.contactsMap)
+    }
+  }
+
   createContactRef = id => db.doc(`contacts/${id}`)
 
   saveEditedValue = option => {
-    const { onFieldChange, options, multiSelect } = this.props
+    const { onFieldChange, isContactSelect, multiSelect } = this.props
 
     onFieldChange(
-      options
+      !isContactSelect
         ? option.value
         : multiSelect
         ? option
@@ -28,14 +39,14 @@ class ContactCellSelect extends ContactCell {
   }
 
   render() {
-    const { updating, newValue } = this.state
-    const { value, typeAheadOptions, multiSelect, options } = this.props
+    const { updating, value, newValue } = this.state
+    const { isContactSelect, multiSelect, options } = this.props
 
     if (updating) {
       return (
         <span className="contact-col pl3 flex-auto f6 black-70">
           <Select
-            options={typeAheadOptions}
+            options={options}
             blurInputOnSelect={false}
             closeMenuOnSelect={false}
             isClearable={!options}
@@ -55,7 +66,7 @@ class ContactCellSelect extends ContactCell {
         onClick={this.switchToEdit}
         className="contact-col pointer underline-hover pl3 flex-auto f6 black-70"
       >
-        {options
+        {!isContactSelect
           ? value
           : multiSelect
           ? value.map(fi => fi.label).join(', ')
@@ -68,6 +79,8 @@ class ContactCellSelect extends ContactCell {
 ContactCellSelect.propTypes = {
   field: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   multiSelect: PropTypes.bool,
+  isContactSelect: PropTypes.bool.isRequired,
+  contactsMap: PropTypes.object,
   options: PropTypes.array,
   onFieldChange: PropTypes.func.isRequired
 }
@@ -77,13 +90,4 @@ ContactCellSelect.defaultProps = {
   options: undefined
 }
 
-export default connect((state, ownProps) => ({
-  value: ownProps.options
-    ? ownProps.field
-    : ownProps.multiSelect
-    ? ownProps.field.map(doc =>
-        mapRefToTypeAheadOption(doc, state.contacts.byId)
-      )
-    : mapRefToTypeAheadOption(ownProps.field, state.contacts.byId),
-  typeAheadOptions: ownProps.options || getTypeAheadOptions(state)
-}))(ContactCellSelect)
+export default ContactCellSelect

@@ -1,10 +1,33 @@
 import firebase from 'config/firebase'
 import PropTypes from 'prop-types'
 import React from 'react'
-import { connect } from 'react-redux'
 import ContactCell from './ContactCell'
 
 class ContactCellTimestamp extends ContactCell {
+  static getDerivedStateFromProps(props, state) {
+    if (props.field) {
+      if (props.field instanceof firebase.firestore.Timestamp) {
+        return {
+          ...state,
+          value: props.field
+            .toDate()
+            .toISOString()
+            .slice(0, 10)
+        }
+      }
+
+      return {
+        ...state,
+        value: new Date(props.field).toISOString().slice(0, 10)
+      }
+    }
+
+    return {
+      ...state,
+      value: ''
+    }
+  }
+
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
@@ -14,8 +37,7 @@ class ContactCellTimestamp extends ContactCell {
   }
 
   render() {
-    const { updating, newValue } = this.state
-    const { value } = this.props
+    const { value, updating, newValue } = this.state
 
     if (updating) {
       return (
@@ -48,7 +70,7 @@ class ContactCellTimestamp extends ContactCell {
 }
 
 ContactCellTimestamp.propTypes = {
-  field: PropTypes.object,
+  field: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   onFieldChange: PropTypes.func.isRequired
 }
 
@@ -56,11 +78,4 @@ ContactCellTimestamp.defaultProps = {
   field: ''
 }
 
-export default connect((state, ownProps) => ({
-  value: ownProps.field
-    ? ownProps.field
-        .toDate()
-        .toISOString()
-        .slice(0, 10)
-    : ''
-}))(ContactCellTimestamp)
+export default ContactCellTimestamp
