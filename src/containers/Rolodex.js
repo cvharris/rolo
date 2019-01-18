@@ -1,17 +1,22 @@
-import LoadingScreen from 'components/LoadingScreen';
-import Contact from 'lib/Contact';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { Route } from 'react-router';
-import { withRouter } from 'react-router-dom';
-import { getTypeAheadOptions } from 'reducers/contactsReducer';
-import { removeContact, setUserContacts, updateContact as editContactInfo } from '../actions/contactsActions';
-import ContactsList from '../components/ContactsTable/ContactsList';
-import firebase, { db } from '../config/firebase';
-import AddContact from './AddContact';
-import EditContact from './EditContact';
-import Sidebar from './Sidebar';
-import UploadContacts from './UploadContacts';
+import LoadingScreen from 'components/LoadingScreen'
+import Contact from 'lib/Contact'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Route } from 'react-router'
+import { withRouter } from 'react-router-dom'
+import { getTypeAheadOptions } from 'reducers/contactsReducer'
+import {
+  removeContact,
+  setUserContacts,
+  updateContact as editContactInfo
+} from '../actions/contactsActions'
+import firebase, { db } from '../config/firebase'
+import AddContact from './AddContact'
+import AllContacts from './AllContacts'
+import { ContactListProvider } from './ContactListContext'
+import EditContact from './EditContact'
+import Sidebar from './Sidebar'
+import UploadContacts from './UploadContacts'
 
 class Rolodex extends Component {
   state = {
@@ -51,41 +56,24 @@ class Rolodex extends Component {
 
   render() {
     const { loadingContacts } = this.state
-    const {
-      handleLogout,
-      contacts,
-      typeaheadOptions,
-      contactsById,
-      removeContact,
-      updateContact
-    } = this.props
+    const { handleLogout } = this.props
 
     if (loadingContacts) {
       return <LoadingScreen />
     }
 
     return (
-      <div id="app">
-        <Sidebar handleLogout={handleLogout} />
-        <div className="app-body">
-          <Route
-            exact
-            path="/"
-            render={() => (
-              <ContactsList
-                contacts={contacts}
-                contactsMap={contactsById}
-                contactTypeaheadOptions={typeaheadOptions}
-                onRemoveContact={removeContact}
-                updateContact={updateContact}
-              />
-            )}
-          />
-          <Route path="/new-contact" component={AddContact} />
-          <Route path="/edit-contact/:contactId" component={EditContact} />
-          <Route path="/upload-contacts" component={UploadContacts} />
+      <ContactListProvider>
+        <div id="app">
+          <Sidebar handleLogout={handleLogout} />
+          <div className="app-body">
+            <Route exact path="/" component={AllContacts} />
+            <Route path="/new-contact" component={AddContact} />
+            <Route path="/edit-contact/:contactId" component={EditContact} />
+            <Route path="/upload-contacts" component={UploadContacts} />
+          </div>
         </div>
-      </div>
+      </ContactListProvider>
     )
   }
 }

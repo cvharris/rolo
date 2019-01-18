@@ -1,54 +1,51 @@
-import Contact from 'lib/Contact';
-import contactFields from 'lib/contactFields';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import ContactRow from './ContactRow';
+import { ContactListConsumer } from 'containers/ContactListContext'
+import Contact from 'lib/Contact'
+import contactFields from 'lib/contactFields'
+import React from 'react'
+import ContactRow from './ContactRow'
 
-class ContactsList extends Component {
-  updateContact = (contact, field, val) => {
-    const { updateContact } = this.props
+const ContactsList = () => {
+  const onUpdateContact = (contact, field, val, updateContact) => {
     const updatedContact = new Contact({ ...contact, [field]: val })
     updateContact(updatedContact)
   }
 
-  render() {
-    const { contacts, contactTypeaheadOptions, contactsMap } = this.props
+  return (
+    <ContactListConsumer>
+      {({ contactsAllIds, contactsById, updateContact }) => {
+        if (!contactsAllIds.length) {
+          return <h1>You have no contacts!</h1>
+        }
 
-    if (!contacts.length) {
-      return <h1>You have no contacts!</h1>
-    }
-
-    return (
-      <div className="rolo-table">
-        <div className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline">
-          <div className="header-col" />
-          {Object.values(contactFields).map((header, i) => (
-            <div className="header-col" key={i}>
-              {header}
+        return (
+          <div className="rolo-table">
+            <div className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline">
+              <div className="header-col" />
+              {Object.values(contactFields).map((header, i) => (
+                <div className="header-col" key={i}>
+                  {header}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="rolo-table-body">
-          {contacts.map(contact => (
-            <ContactRow
-              contact={contact}
-              contactsMap={contactsMap}
-              key={contact.id}
-              contactTypeaheadOptions={contactTypeaheadOptions}
-              updateContact={(f, v) => this.updateContact(contact, f, v)}
-            />
-          ))}
-        </div>
-      </div>
-    )
-  }
-}
-
-ContactsList.propTypes = {
-  contacts: PropTypes.arrayOf(PropTypes.instanceOf(Contact)).isRequired,
-  contactTypeaheadOptions: PropTypes.array.isRequired,
-  contactsMap: PropTypes.object,
-  updateContact: PropTypes.func.isRequired
+            <div className="rolo-table-body">
+              {contactsAllIds.map(cId => {
+                const contact = contactsById[cId]
+                return (
+                  <ContactRow
+                    contact={contact}
+                    key={cId}
+                    updateContact={(f, v) =>
+                      onUpdateContact(contact, f, v, updateContact)
+                    }
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )
+      }}
+    </ContactListConsumer>
+  )
 }
 
 export default ContactsList

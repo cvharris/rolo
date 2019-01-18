@@ -1,9 +1,9 @@
-import { db } from 'config/firebase';
-import PropTypes from 'prop-types';
-import React from 'react';
-import Select from 'react-select';
-import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer';
-import ContactCell from './ContactCell';
+import { db } from 'config/firebase'
+import PropTypes from 'prop-types'
+import React from 'react'
+import Select from 'react-select'
+import { mapRefToTypeAheadOption } from 'reducers/currentContactReducer'
+import ContactCell from './ContactCell'
 
 class ContactCellSelect extends ContactCell {
   static getDerivedStateFromProps(props, state) {

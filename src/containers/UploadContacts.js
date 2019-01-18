@@ -1,13 +1,13 @@
-import ContactsList from 'components/ContactsTable/ContactsList'
-import HowItWorks from 'components/HowItWorks'
-import UploadInstructions from 'components/UploadInstructions'
-import { db } from 'config/firebase'
-import Contact from 'lib/Contact'
-import mapContactsToSelectOpts from 'lib/mapContactsToSelectOpts'
-import parseUploadedContacts from 'lib/parseUploadedContacts'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import ContactsList from 'components/ContactsTable/ContactsList';
+import HowItWorks from 'components/HowItWorks';
+import UploadInstructions from 'components/UploadInstructions';
+import { db } from 'config/firebase';
+import Contact from 'lib/Contact';
+import parseUploadedContacts from 'lib/parseUploadedContacts';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import ContactListContext, { ContactListConsumer } from './ContactListContext';
 
 class UploadContacts extends Component {
   state = {
@@ -93,15 +93,23 @@ class UploadContacts extends Component {
       })
     })
     // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
+    const uploadedContactsMap = mappedContacts.reduce((map, contact) => {
+      map[contact.id] = contact
+      return map
+    }, {})
+
+    this.context.switchContexts(
+      mappedContacts.map(con => con.id),
+      uploadedContactsMap,
+      this.updateContact
+    )
+
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
       uploading: false,
       uploadedContacts: mappedContacts,
-      uploadedContactsMap: mappedContacts.reduce((map, contact) => {
-        map[contact.id] = contact
-        return map
-      }, {})
+      uploadedContactsMap
     })
   }
 
@@ -190,20 +198,15 @@ class UploadContacts extends Component {
                 Submit
               </div>
             </div>
-            <ContactsList
-              contacts={uploadedContacts}
-              updateContact={this.updateContact}
-              contactTypeaheadOptions={mapContactsToSelectOpts(
-                uploadedContacts
-              )}
-              contactsMap={uploadedContactsMap}
-            />
+            <ContactsList />
           </div>
         )}
       </div>
     )
   }
 }
+
+UploadContacts.contextType = ContactListContext
 
 export default withRouter(
   connect(
