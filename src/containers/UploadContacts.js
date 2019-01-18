@@ -1,8 +1,9 @@
 import ContactsList from 'components/ContactsTable/ContactsList'
 import HowItWorks from 'components/HowItWorks'
 import UploadInstructions from 'components/UploadInstructions'
-import firebase, { db } from 'config/firebase'
+import { db } from 'config/firebase'
 import Contact from 'lib/Contact'
+import mapContactsToSelectOpts from 'lib/mapContactsToSelectOpts'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
@@ -13,7 +14,8 @@ class UploadContacts extends Component {
     fileSize: 1,
     uploading: false,
     uploadProgress: 0,
-    uploadedContacts: []
+    uploadedContacts: [],
+    uploadedContactsMap: {}
   }
 
   componentDidMount() {
@@ -36,33 +38,6 @@ class UploadContacts extends Component {
       uploading: true
     })
     // fix references
-    uploadedContacts.forEach(contact => {
-      contact.birthday = firebase.firestore.Timestamp.fromDate(
-        new Date(contact.birthday)
-      )
-      contact.children = contact.children.map(child => {
-        const childId = child.match(/(\d+)$/)
-        const childRef = uploadedContacts.find(
-          con => con.clientId === childId[1]
-        )
-        return childRef ? db.doc(`/uploadedContacts/${childRef.id}`) : child
-      })
-      contact.parents = contact.parents.map(parent => {
-        const parentId = parent.match(/(\d+)$/)
-        const parentRef = uploadedContacts.find(
-          con => con.clientId === parentId[1]
-        )
-        return parentRef ? db.doc(`/uploadedContacts/${parentRef.id}`) : parent
-      })
-      if (contact.spouse) {
-        const spouseRef = uploadedContacts.find(
-          con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
-        )
-        contact.spouse = spouseRef
-          ? db.doc(`/uploadedContacts/${spouseRef.id}`)
-          : contact.spouse
-      }
-    })
     await Promise.all(
       uploadedContacts.map(contact => {
         this.setState({
@@ -103,13 +78,39 @@ class UploadContacts extends Component {
   }
 
   onUploadComplete = contacts => {
-    localStorage.setItem('uploadedContacts', JSON.stringify(contacts))
+    const mappedContacts = contacts.map((contact, i, arr) => {
+      return new Contact({
+        ...contact,
+        children: contact.children.map(child =>
+          this.mapClientIdToFirebaseId(child, arr)
+        ),
+        parents: contact.parents.map(parent =>
+          this.mapClientIdToFirebaseId(parent, arr)
+        ),
+        spouse: contact.spouse
+          ? this.mapClientIdToFirebaseId(contact.spouse, arr)
+          : null
+      })
+    })
+    // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
       uploading: false,
-      uploadedContacts: contacts
+      uploadedContacts: mappedContacts,
+      uploadedContactsMap: mappedContacts.reduce((map, contact) => {
+        map[contact.id] = contact
+        return map
+      }, {})
     })
+  }
+
+  mapClientIdToFirebaseId = (clientRef, contacts) => {
+    const clientId = clientRef.match(/(\d+)$/)
+
+    const firebaseRef = contacts.find(con => con.clientId === clientId[1])
+
+    return firebaseRef ? db.doc(`contacts/${firebaseRef.id}`) : clientRef
   }
 
   handleUploadedSpreadsheet = file => {
@@ -127,11 +128,26 @@ class UploadContacts extends Component {
     )
   }
 
+  updateContact = contact => {
+    this.setState(prevState => ({
+      ...prevState,
+      uploadContacts: prevState.uploadContacts.map(cont =>
+        cont.id === contact.id ? contact : cont
+      )
+    }))
+  }
+
   render() {
-    const { uploadedContacts, uploadProgress, uploading, fileSize } = this.state
+    const {
+      uploadedContacts,
+      uploadedContactsMap,
+      uploadProgress,
+      uploading,
+      fileSize
+    } = this.state
 
     return (
-      <div className="pt3 pb6">
+      <div className="pt3">
         {uploading && (
           <div className="measure-wide center progress-bar">
             <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
@@ -145,7 +161,7 @@ class UploadContacts extends Component {
           </div>
         )}
         {uploadedContacts.length === 0 && (
-          <div className="instructions measure-wide center lh-copy">
+          <div className="instructions measure-wide center lh-copy pb6">
             <h4>Upload Contacts</h4>
             <p>
               Upload a *.csv file with your contacts' information.
@@ -174,7 +190,14 @@ class UploadContacts extends Component {
                 Submit
               </div>
             </div>
-            <ContactsList contacts={uploadedContacts} />
+            <ContactsList
+              contacts={uploadedContacts}
+              updateContact={this.updateContact}
+              contactTypeaheadOptions={mapContactsToSelectOpts(
+                uploadedContacts
+              )}
+              contactsMap={uploadedContactsMap}
+            />
           </div>
         )}
       </div>

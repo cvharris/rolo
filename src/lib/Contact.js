@@ -2,6 +2,7 @@ export default class Contact {
   // TODO: check if firebase timestamp, convert to Date
   constructor({
     id = '-1',
+    clientId = null,
     firstName = '',
     lastName = '',
     phoneNumber = '',
@@ -20,6 +21,7 @@ export default class Contact {
     dod = null
   }) {
     this.id = id
+    this.clientId = clientId
     this.firstName = firstName
     this.lastName = lastName
     this.phoneNumber = phoneNumber
@@ -55,7 +57,8 @@ export default class Contact {
       children: this.children,
       prefix: this.prefix,
       suffix: this.suffix,
-      dod: this.dod
+      dod: this.dod,
+      clientId: this.clientId
     }
   }
 }
