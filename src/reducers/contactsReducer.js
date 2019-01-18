@@ -1,3 +1,4 @@
+import mapContactsToSelectOpts from 'lib/mapContactsToSelectOpts'
 import { createSelector } from 'reselect'
 import {
   ADD_CONTACT,
@@ -44,9 +45,5 @@ const allContactsSelector = state =>
 
 export const getTypeAheadOptions = createSelector(
   allContactsSelector,
-  contacts =>
-    contacts.map(contact => ({
-      value: contact.id,
-      label: `${contact.firstName} ${contact.lastName}`
-    }))
+  mapContactsToSelectOpts
 )
