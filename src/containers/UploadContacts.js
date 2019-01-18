@@ -1,21 +1,19 @@
-import ContactsList from 'components/ContactsTable/ContactsList';
-import HowItWorks from 'components/HowItWorks';
-import UploadInstructions from 'components/UploadInstructions';
-import { db } from 'config/firebase';
-import Contact from 'lib/Contact';
-import parseUploadedContacts from 'lib/parseUploadedContacts';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import ContactListContext, { ContactListConsumer } from './ContactListContext';
+import ContactsList from 'components/ContactsTable/ContactsList'
+import HowItWorks from 'components/HowItWorks'
+import UploadInstructions from 'components/UploadInstructions'
+import { db } from 'config/firebase'
+import Contact from 'lib/Contact'
+import parseUploadedContacts from 'lib/parseUploadedContacts'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import ContactListContext from './ContactListContext'
 
 class UploadContacts extends Component {
   state = {
     fileSize: 1,
     uploading: false,
-    uploadProgress: 0,
-    uploadedContacts: [],
-    uploadedContactsMap: {}
+    uploadProgress: 0
   }
 
   componentDidMount() {
@@ -23,18 +21,24 @@ class UploadContacts extends Component {
       localStorage.getItem('uploadedContacts')
     )
     if (uploadedContacts) {
-      this.setState({
-        ...this.state,
-        uploadedContacts: uploadedContacts.map(contact => new Contact(contact))
-      })
+      this.context.switchContexts(
+        uploadedContacts.map(con => con.id),
+        uploadedContacts, // TODO: fix this
+        this.updateContact
+      )
+    } else {
+      this.context.switchContexts([], {}, this.updateContact)
     }
   }
 
   uploadContacts = async () => {
-    const { uploadedContacts, uploadProgress } = this.state
+    const { uploadProgress } = this.state
+    const { contactsAllIds, contactsById } = this.context
+    const uploadedContacts = contactsAllIds.map(cId => contactsById[cId])
+
     this.setState({
       ...this.state,
-      fileSize: uploadedContacts.length,
+      fileSize: contactsAllIds.length,
       uploading: true
     })
     // fix references
@@ -56,8 +60,7 @@ class UploadContacts extends Component {
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
-      uploading: false,
-      uploadedContacts: []
+      uploading: false
     })
   }
 
@@ -72,8 +75,7 @@ class UploadContacts extends Component {
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
-      uploading: false,
-      uploadedContacts: []
+      uploading: false
     })
   }
 
@@ -107,9 +109,7 @@ class UploadContacts extends Component {
     this.setState({
       uploadProgress: 0,
       fileSize: 1,
-      uploading: false,
-      uploadedContacts: mappedContacts,
-      uploadedContactsMap
+      uploading: false
     })
   }
 
@@ -137,22 +137,14 @@ class UploadContacts extends Component {
   }
 
   updateContact = contact => {
-    this.setState(prevState => ({
-      ...prevState,
-      uploadContacts: prevState.uploadContacts.map(cont =>
-        cont.id === contact.id ? contact : cont
-      )
-    }))
+    const { contactsById, updateContacts } = this.context
+    const newContactMap = { ...contactsById, [contact.id]: contact }
+    updateContacts(newContactMap)
   }
 
   render() {
-    const {
-      uploadedContacts,
-      uploadedContactsMap,
-      uploadProgress,
-      uploading,
-      fileSize
-    } = this.state
+    const { uploadProgress, uploading, fileSize } = this.state
+    const { contactsAllIds } = this.context
 
     return (
       <div className="pt3">
@@ -168,7 +160,7 @@ class UploadContacts extends Component {
             </div>
           </div>
         )}
-        {uploadedContacts.length === 0 && (
+        {contactsAllIds.length === 0 && (
           <div className="instructions measure-wide center lh-copy pb6">
             <h4>Upload Contacts</h4>
             <p>
@@ -188,7 +180,7 @@ class UploadContacts extends Component {
             <HowItWorks />
           </div>
         )}
-        {uploadedContacts.length > 0 && (
+        {contactsAllIds.length > 0 && (
           <div className="uploaded">
             <div className="uploaded-header center measure-wide flex justify-end">
               <div

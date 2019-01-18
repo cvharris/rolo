@@ -6,15 +6,25 @@ import ContactListContext from './ContactListContext';
 
 class AllContacts extends Component {
   componentDidMount() {
-    const { contactsAllIds, contactsById, updateContact } = this.props
+    const { contactsAllIds, contactsById } = this.props
 
-    this.context.switchContexts(contactsAllIds, contactsById, updateContact)
+    this.context.switchContexts(
+      contactsAllIds,
+      contactsById,
+      this.onUpdateContact
+    )
+  }
+
+  onUpdateContact = contact => {
+    const { contactsById, updateContacts } = this.context
+
+    const newContactMap = { ...contactsById, [contact.id]: contact }
+    updateContacts(newContactMap)
+    this.props.updateContact(contact)
   }
 
   render() {
-    return (
-      <ContactsList />
-    )
+    return <ContactsList />
   }
 }
 

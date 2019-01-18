@@ -1,19 +1,19 @@
-import PropTypes from 'prop-types'
-import React from 'react'
-import Select from 'react-select'
-import ContactCell from './ContactCell'
+import { db } from 'config/firebase';
+import PropTypes from 'prop-types';
+import React from 'react';
+import Select from 'react-select';
+import ContactCell from './ContactCell';
 
-class ContactCellSelect extends ContactCell {
+class ContactCellContactSelect extends ContactCell {
+  createContactRef = id => db.doc(`contacts/${id}`)
+
   saveEditedValue = option => {
     const { onFieldChange, multiSelect } = this.props
 
-    onFieldChange(
-      option
-        ? multiSelect
-          ? option.map(opt => opt.value)
-          : option.value
-        : null
-    )
+    const newVal = multiSelect ? option ? option.map(opt => this.createContactRef(opt.value)) : [] : option ? this.createContactRef(option.value) : null
+
+    onFieldChange(newVal)
+
     this.updateValue(option)
   }
 
@@ -45,21 +45,24 @@ class ContactCellSelect extends ContactCell {
         onClick={this.switchToEdit}
         className="contact-col pointer underline-hover pl3 flex-auto f6 black-70"
       >
-        {multiSelect ? field.join(', ') : field}
+        {multiSelect
+          ? field.map(fi => fi.label).join(', ')
+          : field.label}
       </span>
     )
   }
 }
 
-ContactCellSelect.propTypes = {
+ContactCellContactSelect.propTypes = {
   field: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   multiSelect: PropTypes.bool,
-  options: PropTypes.array.isRequired,
+  options: PropTypes.array,
   onFieldChange: PropTypes.func.isRequired
 }
 
-ContactCellSelect.defaultProps = {
-  multiSelect: false
+ContactCellContactSelect.defaultProps = {
+  multiSelect: false,
+  options: undefined
 }
 
-export default ContactCellSelect
+export default ContactCellContactSelect

@@ -4,40 +4,21 @@ import React from 'react'
 import ContactCell from './ContactCell'
 
 class ContactCellTimestamp extends ContactCell {
-  static getDerivedStateFromProps(props, state) {
-    if (props.field) {
-      if (props.field instanceof firebase.firestore.Timestamp) {
-        return {
-          ...state,
-          value: props.field
-            .toDate()
-            .toISOString()
-            .slice(0, 10)
-        }
-      }
-
-      return {
-        ...state,
-        value: new Date(props.field).toISOString().slice(0, 10)
-      }
-    }
-
-    return {
-      ...state,
-      value: ''
-    }
-  }
-
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
 
-    onFieldChange(firebase.firestore.Timestamp.fromDate(new Date(newValue)))
+    onFieldChange(
+      newValue
+        ? firebase.firestore.Timestamp.fromDate(new Date(newValue))
+        : null
+    )
     this.cancelEditing()
   }
 
   render() {
-    const { value, updating, newValue } = this.state
+    const { updating, newValue } = this.state
+    const { field } = this.props
 
     if (updating) {
       return (
@@ -63,7 +44,7 @@ class ContactCellTimestamp extends ContactCell {
         onClick={this.switchToEdit}
         className="contact-col pl3 flex-auto f6 pointer black-70"
       >
-        {value}
+        {field}
       </span>
     )
   }

@@ -12,27 +12,37 @@ class ContactListProvider extends Component {
     updateContact: () => {}
   }
 
+  updateContacts = (contactsById) => {
+    this.setState(prevState => ({
+      ...prevState,
+      contactsById,
+      typeaheadOptions: mapContactsToSelectOpts(
+        prevState.contactsAllIds.map(cId => contactsById[cId])
+      ) 
+    }))
+  }
+
   switchContexts = (contactsAllIds, contactsById, newUpdateFunction) => {
-      this.setState({
-        contactsAllIds,
-        contactsById,
-        typeaheadOptions: mapContactsToSelectOpts(
-          contactsAllIds.map(cId => contactsById[cId])
-        ),
-        updateContact: newUpdateFunction
-      })
+    this.setState({
+      contactsAllIds,
+      contactsById,
+      typeaheadOptions: mapContactsToSelectOpts(
+        contactsAllIds.map(cId => contactsById[cId])
+      ),
+      updateContact: newUpdateFunction
+    })
   }
 
   render() {
     return (
-      <Provider value={{ ...this.state, switchContexts: this.switchContexts }}>
+      <Provider value={{ ...this.state, switchContexts: this.switchContexts, updateContacts: this.updateContacts }}>
         {this.props.children}
       </Provider>
     )
   }
 }
 
-export { ContactListProvider, Consumer as ContactListConsumer }
+export { ContactListProvider, Consumer as ContactListConsumer };
 
 export default ContactListContext
 

@@ -1,14 +1,9 @@
-import PropTypes from 'prop-types'
-import React from 'react'
-import ContactCell from './ContactCell'
+import PropTypes from 'prop-types';
+import React from 'react';
+import ContactCell from './ContactCell';
 
 class ContactCellText extends ContactCell {
-  static getDerivedStateFromProps(props, state) {
-    return {
-      ...state,
-      value: props.field
-    }
-  }
+
   saveEditedValue = () => {
     const { newValue } = this.state
     const { onFieldChange } = this.props
@@ -18,7 +13,8 @@ class ContactCellText extends ContactCell {
   }
 
   render() {
-    const { updating, value, newValue } = this.state
+    const { updating, newValue } = this.state
+    const { field } = this.props
 
     if (updating) {
       return (
@@ -43,7 +39,7 @@ class ContactCellText extends ContactCell {
         onClick={this.switchToEdit}
         className="contact-col pl3 flex-auto f6 pointer black-70"
       >
-        {value}
+        {field}
       </span>
     )
   }

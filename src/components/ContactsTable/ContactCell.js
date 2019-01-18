@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 
 class ContactCell extends Component {
   state = {
     updating: false,
-    value: '',
     newValue: ''
   }
 
@@ -13,12 +12,12 @@ class ContactCell extends Component {
   }
 
   switchToEdit = () => {
-    const { value } = this.props
+    const { field } = this.props
+
     this.setState(
       {
         updating: true,
-        value,
-        newValue: value
+        newValue: field
       },
       () => this.inputRef.current.focus()
     )
@@ -27,17 +26,15 @@ class ContactCell extends Component {
   updateValue = newValue => {
     this.setState({
       updating: true,
-      value: newValue,
       newValue
     })
   }
 
   cancelEditing = () => {
-    const { value, newValue } = this.state
+    const { newValue } = this.state
 
     this.setState({
       updating: false,
-      value,
       newValue
     })
   }
