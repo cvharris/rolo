@@ -1,13 +1,13 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Contact from 'lib/Contact'
-import PropTypes from 'prop-types'
-import React from 'react'
-import { Link } from 'react-router-dom'
-import ContactCellSelect from './ContactCellSelect'
-import ContactCellText from './ContactCellText'
-import ContactCellTimestamp from './ContactCellTimestamp'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Contact from 'lib/Contact';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import ContactCellSelect from './ContactCellSelect';
+import ContactCellText from './ContactCellText';
+import ContactCellTimestamp from './ContactCellTimestamp';
 
-const ContactRow = ({ contact, updateContact }) => (
+const ContactRow = ({ contact, updateContact, contactTypeaheadOptions, contactsMap }) => (
   <div className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc">
     <Link to={`/edit-contact/${contact.id}`} style={{ padding: '0 1rem' }}>
       <FontAwesomeIcon icon={['far', 'edit']} />
@@ -27,6 +27,7 @@ const ContactRow = ({ contact, updateContact }) => (
     <ContactCellSelect
       field={contact.gender || ''}
       options={[{ label: 'Male', value: 'M' }, { label: 'Female', value: 'F' }]}
+      isContactSelect={false}
       onFieldChange={val => updateContact('gender', val)}
     />
     <ContactCellText
@@ -47,15 +48,24 @@ const ContactRow = ({ contact, updateContact }) => (
     />
     <ContactCellSelect
       field={contact.spouse || ''}
+      options={contactTypeaheadOptions}
+      isContactSelect={true}
+      contactsMap={contactsMap}
       onFieldChange={val => updateContact('spouse', val)}
     />
     <ContactCellSelect
       field={contact.parents || []}
+      options={contactTypeaheadOptions}
+      isContactSelect={true}
+      contactsMap={contactsMap}
       multiSelect={true}
       onFieldChange={val => updateContact('parents', val)}
     />
     <ContactCellSelect
       field={contact.children || []}
+      options={contactTypeaheadOptions}
+      isContactSelect={true}
+      contactsMap={contactsMap}
       multiSelect={true}
       onFieldChange={val => updateContact('children', val)}
     />
@@ -64,6 +74,8 @@ const ContactRow = ({ contact, updateContact }) => (
 
 ContactRow.propTypes = {
   contact: PropTypes.instanceOf(Contact).isRequired,
+  contactTypeaheadOptions: PropTypes.array.isRequired,
+  contactsMap: PropTypes.object,
   updateContact: PropTypes.func.isRequired
 }
 

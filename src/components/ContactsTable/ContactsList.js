@@ -1,8 +1,8 @@
-import Contact from 'lib/Contact'
-import contactFields from 'lib/contactFields'
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import ContactRow from './ContactRow'
+import Contact from 'lib/Contact';
+import contactFields from 'lib/contactFields';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import ContactRow from './ContactRow';
 
 class ContactsList extends Component {
   updateContact = (contact, field, val) => {
@@ -12,7 +12,7 @@ class ContactsList extends Component {
   }
 
   render() {
-    const { contacts } = this.props
+    const { contacts, contactTypeaheadOptions, contactsMap } = this.props
 
     if (!contacts.length) {
       return <h1>You have no contacts!</h1>
@@ -32,7 +32,9 @@ class ContactsList extends Component {
           {contacts.map(contact => (
             <ContactRow
               contact={contact}
+              contactsMap={contactsMap}
               key={contact.id}
+              contactTypeaheadOptions={contactTypeaheadOptions}
               updateContact={(f, v) => this.updateContact(contact, f, v)}
             />
           ))}
@@ -44,6 +46,8 @@ class ContactsList extends Component {
 
 ContactsList.propTypes = {
   contacts: PropTypes.arrayOf(PropTypes.instanceOf(Contact)).isRequired,
+  contactTypeaheadOptions: PropTypes.array.isRequired,
+  contactsMap: PropTypes.object,
   updateContact: PropTypes.func.isRequired
 }
 

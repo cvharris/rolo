@@ -1,20 +1,17 @@
-import LoadingScreen from 'components/LoadingScreen'
-import Contact from 'lib/Contact'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Route } from 'react-router'
-import { withRouter } from 'react-router-dom'
-import {
-  removeContact,
-  setUserContacts,
-  updateContact as editContactInfo
-} from '../actions/contactsActions'
-import ContactsList from '../components/ContactsTable/ContactsList'
-import firebase, { db } from '../config/firebase'
-import AddContact from './AddContact'
-import EditContact from './EditContact'
-import Sidebar from './Sidebar'
-import UploadContacts from './UploadContacts'
+import LoadingScreen from 'components/LoadingScreen';
+import Contact from 'lib/Contact';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Route } from 'react-router';
+import { withRouter } from 'react-router-dom';
+import { getTypeAheadOptions } from 'reducers/contactsReducer';
+import { removeContact, setUserContacts, updateContact as editContactInfo } from '../actions/contactsActions';
+import ContactsList from '../components/ContactsTable/ContactsList';
+import firebase, { db } from '../config/firebase';
+import AddContact from './AddContact';
+import EditContact from './EditContact';
+import Sidebar from './Sidebar';
+import UploadContacts from './UploadContacts';
 
 class Rolodex extends Component {
   state = {
@@ -54,7 +51,14 @@ class Rolodex extends Component {
 
   render() {
     const { loadingContacts } = this.state
-    const { handleLogout, contacts, removeContact, updateContact } = this.props
+    const {
+      handleLogout,
+      contacts,
+      typeaheadOptions,
+      contactsById,
+      removeContact,
+      updateContact
+    } = this.props
 
     if (loadingContacts) {
       return <LoadingScreen />
@@ -70,6 +74,8 @@ class Rolodex extends Component {
             render={() => (
               <ContactsList
                 contacts={contacts}
+                contactsMap={contactsById}
+                contactTypeaheadOptions={typeaheadOptions}
                 onRemoveContact={removeContact}
                 updateContact={updateContact}
               />
@@ -87,7 +93,9 @@ class Rolodex extends Component {
 export default withRouter(
   connect(
     state => ({
-      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId])
+      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId]),
+      contactsById: state.contacts.byId,
+      typeaheadOptions: getTypeAheadOptions(state)
     }),
     {
       updateContactsList: setUserContacts,
