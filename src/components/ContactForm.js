@@ -25,8 +25,8 @@ class ContactForm extends Component {
   }
 
   onSubmit = e => {
-    this.props.onContactSubmit(this.state)
     e.preventDefault()
+    this.props.onContactSubmit(new Contact(this.state))
   }
 
   render() {
