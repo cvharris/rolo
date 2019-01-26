@@ -1,14 +1,13 @@
-import Contact from 'lib/Contact';
-import contactFields from 'lib/contactFields';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import ContactRow from './ContactRow';
+import Contact from 'lib/Contact'
+import contactFields from 'lib/contactFields'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+import ContactRow from './ContactRow'
 
 class ContactsList extends Component {
-
   updateContact = (contact, field, val) => {
     const { updateContact } = this.props
-    const updatedContact = new Contact({...contact, [field]: val})
+    const updatedContact = new Contact({ ...contact, [field]: val })
     updateContact(updatedContact)
   }
 

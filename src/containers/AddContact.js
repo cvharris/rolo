@@ -1,11 +1,11 @@
-import { db } from 'config/firebase';
-import Contact from 'lib/Contact';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { pushContact } from '../actions/contactsActions';
-import ContactForm from '../components/ContactForm';
+import { db } from 'config/firebase'
+import Contact from 'lib/Contact'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { pushContact } from '../actions/contactsActions'
+import ContactForm from '../components/ContactForm'
 
 class AddContact extends Component {
   render() {
@@ -14,6 +14,7 @@ class AddContact extends Component {
         contact={this.props.newContact}
         onNameUpdate={this.props.updateCurrentContactName}
         onContactSubmit={this.props.addContact}
+        submitButtonText="Create New Contact!"
       />
     )
   }

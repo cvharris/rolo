@@ -1,11 +1,11 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import firebase from 'config/firebase';
-import Contact from 'lib/Contact';
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Link } from 'react-router-dom';
-import ContactCell from './ContactCell';
-import ContactCellSelect from './ContactCellSelect';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import firebase from 'config/firebase'
+import Contact from 'lib/Contact'
+import PropTypes from 'prop-types'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import ContactCell from './ContactCell'
+import ContactCellSelect from './ContactCellSelect'
 
 const ContactRow = ({ contact, updateContact }) => (
   <div className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc">
@@ -15,6 +15,10 @@ const ContactRow = ({ contact, updateContact }) => (
     <ContactCell
       field={contact.firstName}
       onFieldChange={val => updateContact('firstName', val)}
+    />
+    <ContactCell
+      field={contact.middleName}
+      onFieldChange={val => updateContact('middleName', val)}
     />
     <ContactCell
       field={contact.maidenName}
