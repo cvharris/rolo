@@ -1,6 +1,7 @@
 export default class Contact {
+  // TODO: check if firebase timestamp, convert to Date
   constructor({
-    id = null,
+    id = '-1',
     firstName = '',
     lastName = '',
     phoneNumber = '',
@@ -8,6 +9,7 @@ export default class Contact {
     gender = '', //drop down selector
     address = null, //own compoent with multiple fields
     birthday = null, //date picker
+    nickname = '',
     middleName = '',
     maidenName = '',
     spouse = null, //auto complete select list
@@ -25,6 +27,7 @@ export default class Contact {
     this.gender = gender
     this.address = address
     this.birthday = birthday
+    this.nickname = nickname
     this.middleName = middleName
     this.maidenName = maidenName
     this.spouse = spouse
@@ -33,5 +36,26 @@ export default class Contact {
     this.prefix = prefix
     this.suffix = suffix
     this.dod = dod
+  }
+
+  toObject() {
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      phoneNumber: this.phoneNumber,
+      email: this.email,
+      gender: this.gender,
+      address: this.address,
+      birthday: this.birthday,
+      nickname: this.nickname,
+      middleName: this.middleName,
+      maidenName: this.maidenName,
+      spouse: this.spouse,
+      parents: this.parents,
+      children: this.children,
+      prefix: this.prefix,
+      suffix: this.suffix,
+      dod: this.dod
+    }
   }
 }

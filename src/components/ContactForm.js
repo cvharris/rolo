@@ -1,6 +1,8 @@
+import Contact from 'lib/Contact'
+import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import Select from 'react-select'
 import { connect } from 'react-redux'
+import Select from 'react-select'
 import { getTypeAheadOptions } from 'reducers/contactsReducer'
 
 class ContactForm extends Component {
@@ -220,6 +222,12 @@ class ContactForm extends Component {
       </div>
     )
   }
+}
+
+ContactForm.propTypes = {
+  contact: PropTypes.instanceOf(Contact),
+  onContactSubmit: PropTypes.func,
+  typeAheadOptions: PropTypes.array
 }
 
 export default connect(state => ({

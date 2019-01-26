@@ -1,11 +1,14 @@
-import firebase from 'config/firebase'
+import Contact from 'lib/Contact'
 import contactFields from 'lib/contactFields'
+import PropTypes from 'prop-types'
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import ContactRow from './ContactRow'
 
-export default class ContactsList extends Component {
-  editContent = e => {
-    console.log('You are going to edit!')
+class ContactsList extends Component {
+  updateContact = (contact, field, val) => {
+    const { updateContact } = this.props
+    const updatedContact = new Contact({ ...contact, [field]: val })
+    updateContact(updatedContact)
   }
 
   render() {
@@ -17,14 +20,8 @@ export default class ContactsList extends Component {
 
     return (
       <div className="rolo-table">
-        <div
-          className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline"
-          style={{
-            gridTemplateColumns: `repeat(${
-              Object.keys(contactFields).length
-            }, 1fr)`
-          }}
-        >
+        <div className="rolo-table-header pt2 tc fw6 bg-gold pb2 underline">
+          <div className="header-col" />
           {Object.values(contactFields).map((header, i) => (
             <div className="header-col" key={i}>
               {header}
@@ -32,31 +29,22 @@ export default class ContactsList extends Component {
           ))}
         </div>
         <div className="rolo-table-body">
-          {contacts.map((contact, i) => (
-            <Link
-              className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
+          {contacts.map(contact => (
+            <ContactRow
+              contact={contact}
               key={contact.id}
-              style={{
-                textDecoration: 'none',
-                gridTemplateColumns: `repeat(${
-                  Object.keys(contactFields).length
-                }, 1fr)`
-              }}
-              to={`/edit-contact/${contact.id}`}
-            >
-              {Object.keys(contactFields).map((key, j) => (
-                <div className="contact-col pl3 flex-auto" key={j}>
-                  <span className="f6 db black-70">
-                    {contact[key] instanceof firebase.firestore.Timestamp
-                      ? contact[key].toDate().toDateString()
-                      : contact[key]}
-                  </span>
-                </div>
-              ))}
-            </Link>
+              updateContact={(f, v) => this.updateContact(contact, f, v)}
+            />
           ))}
         </div>
       </div>
     )
   }
 }
+
+ContactsList.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.instanceOf(Contact)).isRequired,
+  updateContact: PropTypes.func.isRequired
+}
+
+export default ContactsList

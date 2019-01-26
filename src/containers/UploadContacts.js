@@ -1,9 +1,12 @@
-import ContactsList from 'components/ContactsList'
-import firebase from 'config/firebase'
-import Papa from 'papaparse'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import ContactsList from 'components/ContactsList';
+import HowItWorks from 'components/HowItWorks';
+import UploadInstructions from 'components/UploadInstructions';
+import firebase, { db } from 'config/firebase';
+import parseUploadedContacts from 'lib/parseUploadedContacts';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import Contact from 'lib/Contact';
 
 class UploadContacts extends Component {
   state = {
@@ -13,178 +16,164 @@ class UploadContacts extends Component {
     uploadedContacts: []
   }
 
+  componentDidMount() {
+    const uploadedContacts = JSON.parse(
+      localStorage.getItem('uploadedContacts')
+    )
+    if (uploadedContacts) {
+      this.setState({
+        ...this.state,
+        uploadedContacts: uploadedContacts.map(contact => new Contact(contact))
+      })
+    }
+  }
+
   uploadContacts = async () => {
+    const { uploadedContacts, uploadProgress } = this.state
+    this.setState({
+      ...this.state,
+      fileSize: uploadedContacts.length,
+      uploading: true
+    })
+    // fix references
+    uploadedContacts.forEach(contact => {
+      contact.birthday = firebase.firestore.Timestamp.fromDate(
+        new Date(contact.birthday)
+      )
+      contact.children = contact.children.map(child => {
+        const childId = child.match(/(\d+)$/)
+        const childRef = uploadedContacts.find(
+          con => con.clientId === childId[1]
+        )
+        return childRef ? db.doc(`/uploadedContacts/${childRef.id}`) : child
+      })
+      contact.parents = contact.parents.map(parent => {
+        const parentId = parent.match(/(\d+)$/)
+        const parentRef = uploadedContacts.find(
+          con => con.clientId === parentId[1]
+        )
+        return parentRef ? db.doc(`/uploadedContacts/${parentRef.id}`) : parent
+      })
+      if (contact.spouse) {
+        const spouseRef = uploadedContacts.find(
+          con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
+        )
+        contact.spouse = spouseRef
+          ? db.doc(`/uploadedContacts/${spouseRef.id}`)
+          : contact.spouse
+      }
+    })
     await Promise.all(
-      this.state.uploadedContacts.map(contact => {
-        const {
-          firstName,
-          lastName,
-          gender,
-          birthday,
-          email,
-          phoneNumber,
-          parents,
-          children,
-          spouse
-        } = contact
-        return firebase
-          .firestore()
+      uploadedContacts.map(contact => {
+        this.setState({
+          ...this.state,
+          uploadProgress: uploadProgress + 1
+        })
+        return db
           .collection('contacts')
           .doc(contact.id)
-          .set({
-            firstName,
-            lastName,
-            gender,
-            birthday,
-            email,
-            phoneNumber,
-            parents,
-            children,
-            spouse
-          })
+          .set(contact.toObject())
       })
     )
+
+    localStorage.removeItem('uploadedContacts')
+
+    this.setState({
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false,
+      uploadedContacts: []
+    })
+  }
+
+  onSingleUpload = cursorPosition => {
+    this.setState({
+      ...this.state,
+      uploadProgress: this.state.uploadProgress + cursorPosition
+    })
+  }
+
+  onUploadError = () => {
+    this.setState({
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false,
+      uploadedContacts: []
+    })
+  }
+
+  onUploadComplete = contacts => {
+    localStorage.setItem('uploadedContacts', JSON.stringify(contacts))
+    this.setState({
+      uploadProgress: 0,
+      fileSize: 1,
+      uploading: false,
+      uploadedContacts: contacts
+    })
   }
 
   handleUploadedSpreadsheet = file => {
-    const contacts = []
-
     this.setState({
       ...this.state,
       uploading: true,
       fileSize: file.size
     })
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      step: async (row, parser) => {
-        // TODO: check for errors
-
-        parser.pause()
-        const contact = row.data[0]
-        // Check if contact already exists
-        let docRef = firebase
-          .firestore()
-          .collection('contacts')
-          .doc(contact.id)
-        let foundContact = await docRef.get()
-        if (foundContact.exists) {
-          // update it
-          contact.clientId = contact.id
-          contact.id = foundContact.id
-        } else {
-          docRef = firebase
-            .firestore()
-            .collection('contacts')
-            .where('firstName', '==', contact.firstName)
-            .where('birthday', '==', contact.birthday)
-          const results = await docRef.get()
-          if (results.docs.length > 0) {
-            // update it
-            foundContact = results.docs[0]
-            contact.clientId = contact.id
-            contact.id = foundContact.id
-          } else {
-            // else create new id for it
-            docRef = firebase
-              .firestore()
-              .collection('contacts')
-              .doc()
-            contact.clientId = contact.id
-            contact.id = docRef.id
-          }
-        }
-        contacts.push(contact)
-        this.setState({
-          ...this.state,
-          uploadProgress: this.state.uploadProgress + row.meta.cursor
-        })
-        parser.resume()
-        // parser.abort()
-      },
-      transform: (val, col) => {
-        switch (col) {
-          case 'firstName':
-          case 'lastName':
-          case 'email':
-          case 'phoneNumber':
-          case 'gender':
-            return val ? val.trim() : ''
-          case 'parents':
-          case 'children':
-            return val ? val.split(',') : []
-          case 'spouse':
-            return val ? val : null
-          case 'dod':
-          case 'birthday':
-            return val
-              ? firebase.firestore.Timestamp.fromDate(new Date(val))
-              : null
-          default:
-            return val
-        }
-      },
-      complete: () => {
-        // fix references
-        contacts.forEach(contact => {
-          contact.children = contact.children.map(child => {
-            const childId = child.match(/(\d+)$/)
-            const childRef = contacts.find(con => con.clientId === childId[1])
-            return childRef
-              ? firebase.firestore().doc(`/contacts/${childRef.id}`)
-              : child
-          })
-          contact.parents = contact.parents.map(parent => {
-            const parentId = parent.match(/(\d+)$/)
-            const parentRef = contacts.find(con => con.clientId === parentId[1])
-            return parentRef
-              ? firebase.firestore().doc(`/contacts/${parentRef.id}`)
-              : parent
-          })
-          if (contact.spouse) {
-            const spouseRef = contacts.find(
-              con => con.clientId === contact.spouse.match(/(\d+)$/)[1]
-            )
-            contact.spouse = spouseRef
-              ? firebase.firestore().doc(`/contacts/${spouseRef.id}`)
-              : contact.spouse
-          }
-        })
-        this.setState({
-          uploadProgress: 0,
-          fileSize: 1,
-          uploading: false,
-          uploadedContacts: contacts
-        })
-      }
-    })
+    parseUploadedContacts(
+      file,
+      this.onSingleUpload,
+      this.onUploadComplete,
+      this.onUploadError
+    )
   }
 
   render() {
     const { uploadedContacts, uploadProgress, uploading, fileSize } = this.state
 
     return (
-      <div>
+      <div className="pt3 pb6">
         {uploading && (
-          <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
-            <div
-              className="bg-blue br-pill h1 shadow-1"
-              style={{
-                width: `${Math.round((uploadProgress / fileSize) * 100)}%`
-              }}
-            />
+          <div className="measure-wide center progress-bar">
+            <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
+              <div
+                className="bg-blue br-pill h1 shadow-1"
+                style={{
+                  width: `${Math.round((uploadProgress / fileSize) * 100)}%`
+                }}
+              />
+            </div>
           </div>
         )}
-        <input
-          type="file"
-          name=""
-          accept=".csv"
-          onChange={e => this.handleUploadedSpreadsheet(e.target.files[0])}
-        />
+        {uploadedContacts.length === 0 && (
+          <div className="instructions measure-wide center lh-copy">
+            <h4>Upload Contacts</h4>
+            <p>
+              Upload a *.csv file with your contacts' information.
+              <br />
+              After uploading your contacts you will have the chance to add
+              relations and fix any bad data before your contacts are saved to
+              the database.
+            </p>
+            <input
+              type="file"
+              name=""
+              accept=".csv"
+              onChange={e => this.handleUploadedSpreadsheet(e.target.files[0])}
+            />
+            <UploadInstructions />
+            <HowItWorks />
+          </div>
+        )}
         {uploadedContacts.length > 0 && (
-          <div>
-            <div onClick={this.uploadContacts}>Submit</div>
+          <div className="uploaded">
+            <div className="uploaded-header center measure-wide flex justify-end">
+              <div
+                className="f6 link dim br1 ph3 pv2 mb2 dib white bg-dark-blue"
+                onClick={this.uploadContacts}
+              >
+                Submit
+              </div>
+            </div>
             <ContactsList contacts={uploadedContacts} />
           </div>
         )}
@@ -195,7 +184,7 @@ class UploadContacts extends Component {
 
 export default withRouter(
   connect(
-    state => ({}),
+    (state) => ({}),
     null
   )(UploadContacts)
 )
