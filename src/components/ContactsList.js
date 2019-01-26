@@ -37,6 +37,7 @@ export default class ContactsList extends Component {
               className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc"
               key={contact.id}
               style={{
+                textDecoration: 'none',
                 gridTemplateColumns: `repeat(${
                   Object.keys(contactFields).length
                 }, 1fr)`
