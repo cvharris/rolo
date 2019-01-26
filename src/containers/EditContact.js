@@ -31,6 +31,7 @@ class EditContact extends Component {
         contact={this.props.contact}
         onNameUpdate={this.props.updateCurrentContactName}
         onContactSubmit={this.updateContact}
+        submitButtonText="Save Changes"
       />
     )
   }

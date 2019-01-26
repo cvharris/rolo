@@ -30,6 +30,8 @@ class ContactForm extends Component {
   }
 
   render() {
+    const { submitButtonText } = this.props
+    const { firstName, lastName } = this.state
     return (
       <div className="contact-form">
         <header className="tc pv2 pv5-ns">
@@ -39,9 +41,7 @@ class ContactForm extends Component {
             alt="avatar"
           />
           <h1 className="f5 f4-ns fw6 mid-gray">
-            {this.state.firstName || this.state.lastName
-              ? `${this.state.firstName} ${this.state.lastName}`
-              : 'New Contact'}
+            {firstName || lastName ? `${firstName} ${lastName}` : 'New Contact'}
           </h1>
           {this.state.company && (
             <h2 className="f6 gray fw2 ttu tracked">{this.state.company}</h2>
@@ -56,7 +56,7 @@ class ContactForm extends Component {
                 className="input-reset ba b--black-20 pa2 mb3 db w-100"
                 type="text"
                 name="firstName"
-                value={this.state.firstName}
+                value={firstName}
                 onChange={this.handleInputChange}
               />
             </label>
@@ -89,7 +89,7 @@ class ContactForm extends Component {
                 className="input-reset ba b--black-20 pa2 mb4 db w-100"
                 type="text"
                 name="lastName"
-                value={this.state.lastName}
+                value={lastName}
                 onChange={this.handleInputChange}
               />
             </label>
@@ -215,7 +215,7 @@ class ContactForm extends Component {
               type="submit"
               className="f6 link dim br3 ph3 pv2 mb2 dib white bg-dark-blue"
             >
-              Create New Contact!
+              {submitButtonText}
             </button>
           </form>
         </div>
@@ -227,7 +227,8 @@ class ContactForm extends Component {
 ContactForm.propTypes = {
   contact: PropTypes.instanceOf(Contact),
   onContactSubmit: PropTypes.func,
-  typeAheadOptions: PropTypes.array
+  typeAheadOptions: PropTypes.array,
+  submitButtonText: PropTypes.string
 }
 
 export default connect(state => ({
