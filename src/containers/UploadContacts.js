@@ -6,7 +6,6 @@ import Contact from 'lib/Contact'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import ContactListContext from './ContactListContext'
 
 class UploadContacts extends Component {
@@ -198,9 +197,7 @@ class UploadContacts extends Component {
 
 UploadContacts.contextType = ContactListContext
 
-export default withRouter(
-  connect(
-    state => ({}),
-    null
-  )(UploadContacts)
-)
+export default connect(
+  state => ({}),
+  null
+)(UploadContacts)

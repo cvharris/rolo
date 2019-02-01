@@ -1,9 +1,8 @@
+import { Router } from '@reach/router'
 import LoadingScreen from 'components/LoadingScreen'
 import Contact from 'lib/Contact'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Route } from 'react-router'
-import { withRouter } from 'react-router-dom'
 import { getTypeAheadOptions } from 'reducers/contactsReducer'
 import {
   removeContact,
@@ -23,7 +22,11 @@ class Rolodex extends Component {
     loadingContacts: true
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.getAllContactsForUser()
+  }
+
+  getAllContactsForUser = async () => {
     const { updateContactsList } = this.props
     try {
       const user = await db
@@ -67,10 +70,12 @@ class Rolodex extends Component {
         <div id="app">
           <Sidebar handleLogout={handleLogout} />
           <div className="app-body">
-            <Route exact path="/" component={AllContacts} />
-            <Route path="/new-contact" component={AddContact} />
-            <Route path="/edit-contact/:contactId" component={EditContact} />
-            <Route path="/upload-contacts" component={UploadContacts} />
+            <Router>
+              <AllContacts path="/" />
+              <AddContact path="new-contact" />
+              <EditContact path="edit-contact/:contactId" />
+              <UploadContacts path="upload-contacts" />
+            </Router>
           </div>
         </div>
       </ContactListProvider>
@@ -78,17 +83,15 @@ class Rolodex extends Component {
   }
 }
 
-export default withRouter(
-  connect(
-    state => ({
-      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId]),
-      contactsById: state.contacts.byId,
-      typeaheadOptions: getTypeAheadOptions(state)
-    }),
-    {
-      updateContactsList: setUserContacts,
-      updateContact: editContactInfo,
-      removeContact
-    }
-  )(Rolodex)
-)
+export default connect(
+  state => ({
+    contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId]),
+    contactsById: state.contacts.byId,
+    typeaheadOptions: getTypeAheadOptions(state)
+  }),
+  {
+    updateContactsList: setUserContacts,
+    updateContact: editContactInfo,
+    removeContact
+  }
+)(Rolodex)

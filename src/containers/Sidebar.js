@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Link } from '@reach/router'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { NavLink } from 'react-router-dom'
 
 class Sidebar extends Component {
   render() {
@@ -11,21 +11,21 @@ class Sidebar extends Component {
           <FontAwesomeIcon icon={['far', 'address-book']} /> Rolo
         </h1>
         <nav className="f3 fw6">
-          <NavLink to="/">
+          <Link to="/">
             <span className="link dim white dib mr3 hover-light-gray">
               <FontAwesomeIcon icon={['far', 'list-ul']} /> List
             </span>
-          </NavLink>
-          <NavLink to="/new-contact">
+          </Link>
+          <Link to="new-contact">
             <span className="link dim white dib mr3 hover-light-gray min">
               <FontAwesomeIcon icon={['far', 'plus']} /> Add
             </span>
-          </NavLink>
-          <NavLink to="/upload-contacts">
+          </Link>
+          <Link to="upload-contacts">
             <span className="link dim white dib mr3 hover-light-gray">
               <FontAwesomeIcon icon={['far', 'upload']} /> Upload
             </span>
-          </NavLink>
+          </Link>
           <div
             className="link dim white dib hover-light-gray pointer"
             onClick={this.props.handleLogout}

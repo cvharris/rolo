@@ -5,6 +5,8 @@ import {
   faListUl,
   faPlus,
   faSignOut,
+  faSortAlphaDown,
+  faSortAlphaUp,
   faSpinner,
   faUpload
 } from '@fortawesome/pro-regular-svg-icons'
@@ -12,7 +14,6 @@ import configureStore from 'config/store'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './App.css'
 import './index.css'
@@ -25,14 +26,14 @@ library.add(
   faListUl,
   faPlus,
   faSignOut,
-  faEdit
+  faEdit,
+  faSortAlphaUp,
+  faSortAlphaDown
 )
 
 ReactDOM.render(
   <Provider store={configureStore()}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </Provider>,
   document.getElementById('root')
 )

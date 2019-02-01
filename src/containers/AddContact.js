@@ -1,11 +1,10 @@
-import { db } from 'config/firebase';
-import Contact from 'lib/Contact';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
-import { pushContact } from '../actions/contactsActions';
-import ContactForm from '../components/ContactForm';
+import { db } from 'config/firebase'
+import Contact from 'lib/Contact'
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { pushContact } from '../actions/contactsActions'
+import ContactForm from '../components/ContactForm'
 
 class AddContact extends Component {
   render() {
@@ -37,11 +36,9 @@ const mapDispatchToProps = (dispatch, props) => ({
   }
 })
 
-export default withRouter(
-  connect(
-    state => ({
-      newContact: state.currentContact
-    }),
-    mapDispatchToProps
-  )(AddContact)
-)
+export default connect(
+  state => ({
+    newContact: state.currentContact
+  }),
+  mapDispatchToProps
+)(AddContact)
