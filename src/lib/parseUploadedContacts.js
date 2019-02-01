@@ -1,16 +1,22 @@
 import firebase, { db } from 'config/firebase'
 import consola from 'consola'
+import {
+  PhoneNumberFormat as PNF,
+  PhoneNumberUtil
+} from 'google-libphonenumber'
 import Contact from 'lib/Contact'
 import Papa from 'papaparse'
 
 export default (file, onStep, onComplete, onError) => {
   // Build the list of uploaded contacts
   const contacts = []
+  const phoneUtil = PhoneNumberUtil.getInstance()
 
   const createNewContact = (contact, docRef) => {
     docRef = db.collection('contacts').doc()
     return {
       ...contact,
+      uploadedBy: firebase.auth().currentUser.uid,
       clientId: contact.id,
       id: docRef.id
     }
@@ -43,6 +49,16 @@ export default (file, onStep, onComplete, onError) => {
           return val ? val.split(',') : []
         case 'spouse':
           return val ? val : null
+        case 'phoneNumber':
+          if (val) {
+            const parsedNumber = phoneUtil.parse(val, 'US')
+            if (phoneUtil.isValidNumber(parsedNumber)) {
+              return phoneUtil.format(parsedNumber, PNF.E164)
+            } else {
+              return val
+            }
+          }
+          return ''
         case 'dod':
         case 'birthday':
           return val
