@@ -32,7 +32,6 @@ class UploadContacts extends Component {
   }
 
   uploadContacts = async () => {
-    const { uploadProgress } = this.state
     const { contactsAllIds, contactsById } = this.context
     const uploadedContacts = contactsAllIds.map(cId => contactsById[cId])
 
@@ -41,21 +40,20 @@ class UploadContacts extends Component {
       fileSize: contactsAllIds.length,
       uploading: true
     })
-    // fix references
-    await Promise.all(
-      uploadedContacts.map(contact => {
-        this.setState({
-          ...this.state,
-          uploadProgress: uploadProgress + 1
-        })
-        return db
-          .collection('contacts')
-          .doc(contact.id)
-          .set(contact.toObject())
-      })
-    )
+
+    const updateAll = db.batch()
+    uploadedContacts.forEach(contact => {
+      updateAll.set(
+        db.collection('contacts').doc(contact.id),
+        contact.toObject()
+      )
+    })
+
+    await updateAll.commit()
 
     localStorage.removeItem('uploadedContacts')
+
+    this.context.switchContexts([], {}, this.updateContact)
 
     this.setState({
       uploadProgress: 0,
