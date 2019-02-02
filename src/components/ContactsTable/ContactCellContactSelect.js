@@ -12,10 +12,10 @@ class ContactCellContactSelect extends ContactCell {
 
     const newVal = multiSelect
       ? option
-        ? option.map(opt => this.createContactRef(opt.value))
+        ? option.map(opt => this.createContactRef(opt.id))
         : []
       : option
-      ? this.createContactRef(option.value)
+      ? this.createContactRef(option.id)
       : null
 
     onFieldChange(newVal)
@@ -36,7 +36,7 @@ class ContactCellContactSelect extends ContactCell {
             closeMenuOnSelect={false}
             getOptionLabel={option => `${option.firstName} ${option.lastName}`}
             getOptionValue={option => option.id}
-            isClearable={!options}
+            isClearable={!multiSelect}
             ref={this.inputRef}
             value={newValue}
             onKeyDown={e => (e.key === 'Enter' ? this.cancelEditing() : null)}
