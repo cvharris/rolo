@@ -12,7 +12,6 @@ import {
 import firebase, { db } from '../config/firebase'
 import AddContact from './AddContact'
 import AllContacts from './AllContacts'
-import { ContactListProvider } from './ContactListContext'
 import EditContact from './EditContact'
 import Sidebar from './Sidebar'
 import UploadContacts from './UploadContacts'
@@ -66,19 +65,17 @@ class Rolodex extends Component {
     }
 
     return (
-      <ContactListProvider>
-        <div id="app">
-          <Sidebar handleLogout={handleLogout} />
-          <div className="app-body">
-            <Router>
-              <AllContacts path="/" />
-              <AddContact path="new-contact" />
-              <EditContact path="edit-contact/:contactId" />
-              <UploadContacts path="upload-contacts" />
-            </Router>
-          </div>
+      <div id="app">
+        <Sidebar handleLogout={handleLogout} />
+        <div className="app-body">
+          <Router>
+            <AllContacts path="/" onNavBack={this.getAllContactsForUser} />
+            <AddContact path="new-contact" />
+            <EditContact path="edit-contact/:contactId" />
+            <UploadContacts path="upload-contacts" />
+          </Router>
         </div>
-      </ContactListProvider>
+      </div>
     )
   }
 }

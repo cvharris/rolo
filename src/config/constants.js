@@ -7,6 +7,9 @@ export const UPDATE_CONTACT = 'UPDATE_CONTACT'
 export const UPLOAD_CONTACTS = 'UPLOAD_CONTACTS'
 export const MERGE_CONTACTS = 'MERGE_CONTACTS'
 
+// ContactsTableSorter
+export const SORT_TABLE = 'SORT_TABLE'
+
 // Current Contact
 export const UPDATE_CURRENT_CONTACT = 'UPDATE_CURRENT_CONTACT'
 export const RESET_CURRENT_CONTACT = 'RESET_CURRENT_CONTACT'

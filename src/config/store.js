@@ -1,3 +1,4 @@
+import tableSorter from 'reducers/contactsTableSorter.reducer'
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import thunk from 'redux-thunk'
@@ -8,7 +9,8 @@ const configureStore = persistedState => {
   const store = createStore(
     combineReducers({
       contacts,
-      currentContact
+      currentContact,
+      tableSorter
     }),
     persistedState,
     compose(

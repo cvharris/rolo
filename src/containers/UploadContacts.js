@@ -1,44 +1,41 @@
+import { sortContactsBy } from 'actions/contactsTableSorterActions'
 import ContactsList from 'components/ContactsTable/ContactsList'
 import HowItWorks from 'components/HowItWorks'
 import UploadInstructions from 'components/UploadInstructions'
 import { db } from 'config/firebase'
 import Contact from 'lib/Contact'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
+import sortContacts from 'lib/sortContacts'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import ContactListContext from './ContactListContext'
+import memoize from 'lodash/memoize'
 
 class UploadContacts extends Component {
   state = {
+    contactIds: [],
+    contactsById: {},
     fileSize: 1,
     uploading: false,
     uploadProgress: 0
   }
 
   componentDidMount() {
+    // TODO: store uploaded contacts in localstorage until after upload
     const uploadedContacts = JSON.parse(
       localStorage.getItem('uploadedContacts')
     )
-    if (uploadedContacts) {
-      this.context.switchContexts(
-        uploadedContacts.map(con => con.id),
-        uploadedContacts, // TODO: fix this
-        this.updateContact
-      )
-    } else {
-      this.context.switchContexts([], {}, this.updateContact)
-    }
   }
 
   uploadContacts = async () => {
-    const { contactsAllIds, contactsById } = this.context
-    const uploadedContacts = contactsAllIds.map(cId => contactsById[cId])
+    const { contactIds, contactsById } = this.state
+    const { navigate } = this.props
+    const uploadedContacts = contactIds.map(cId => contactsById[cId])
 
-    this.setState({
-      ...this.state,
-      fileSize: contactsAllIds.length,
+    this.setState(prevState => ({
+      ...prevState,
+      fileSize: contactIds.length,
       uploading: true
-    })
+    }))
 
     const updateAll = db.batch()
     uploadedContacts.forEach(contact => {
@@ -52,13 +49,18 @@ class UploadContacts extends Component {
 
     localStorage.removeItem('uploadedContacts')
 
-    this.context.switchContexts([], {}, this.updateContact)
-
-    this.setState({
-      uploadProgress: 0,
-      fileSize: 1,
-      uploading: false
-    })
+    this.setState(
+      {
+        contactIds: [],
+        contactsById: {},
+        uploadProgress: 0,
+        fileSize: 1,
+        uploading: false
+      },
+      () => {
+        navigate('/')
+      }
+    )
   }
 
   onSingleUpload = cursorPosition => {
@@ -69,11 +71,12 @@ class UploadContacts extends Component {
   }
 
   onUploadError = () => {
-    this.setState({
+    this.setState(prevState => ({
+      ...prevState,
       uploadProgress: 0,
       fileSize: 1,
       uploading: false
-    })
+    }))
   }
 
   onUploadComplete = contacts => {
@@ -91,19 +94,16 @@ class UploadContacts extends Component {
           : null
       })
     })
+    // TODO: save uploaded Contacts in localStorage
     // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
     const uploadedContactsMap = mappedContacts.reduce((map, contact) => {
       map[contact.id] = contact
       return map
     }, {})
 
-    this.context.switchContexts(
-      mappedContacts.map(con => con.id),
-      uploadedContactsMap,
-      this.updateContact
-    )
-
     this.setState({
+      contactIds: mappedContacts.map(con => con.id),
+      contactsById: uploadedContactsMap,
       uploadProgress: 0,
       fileSize: 1,
       uploading: false
@@ -134,70 +134,94 @@ class UploadContacts extends Component {
   }
 
   updateContact = contact => {
-    const { contactsById, updateContacts } = this.context
+    const { contactsById } = this.state
     const newContactMap = { ...contactsById, [contact.id]: contact }
-    updateContacts(newContactMap)
+    this.setState(prevState => ({
+      ...prevState,
+      contactsById: newContactMap
+    }))
   }
 
   render() {
     const { uploadProgress, uploading, fileSize } = this.state
-    const { contactsAllIds } = this.context
+    if (uploading) {
+      return (
+        <div className="measure-wide pt3 center progress-bar">
+          <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
+            <div
+              className="bg-blue br-pill h1 shadow-1"
+              style={{
+                width: `${Math.round((uploadProgress / fileSize) * 100)}%`
+              }}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    const { contactIds, contactsById } = this.state
+
+    if (contactIds.length === 0) {
+      return (
+        <div className="instructions measure-wide center lh-copy pb6">
+          <h4>Upload Contacts</h4>
+          <p>
+            Upload a *.csv file with your contacts' information.
+            <br />
+            After uploading your contacts you will have the chance to add
+            relations and fix any bad data before your contacts are saved to the
+            database.
+          </p>
+          <input
+            type="file"
+            name=""
+            accept=".csv"
+            onChange={e => this.handleUploadedSpreadsheet(e.target.files[0])}
+          />
+          <UploadInstructions />
+          <HowItWorks />
+        </div>
+      )
+    }
+
+    const { sortOrder, reverse, sortContactsBy } = this.props
+
+    const contacts = memoize(sortContacts(
+      contactIds.map(cId => contactsById[cId]),
+      sortOrder,
+      reverse
+    ))
 
     return (
       <div className="pt3">
-        {uploading && (
-          <div className="measure-wide center progress-bar">
-            <div className="bg-moon-gray br-pill h1 overflow-y-hidden">
-              <div
-                className="bg-blue br-pill h1 shadow-1"
-                style={{
-                  width: `${Math.round((uploadProgress / fileSize) * 100)}%`
-                }}
-              />
+        <div className="uploaded">
+          <div className="uploaded-header center measure-wide flex justify-end">
+            <div
+              className="f6 link dim br1 ph3 pv2 mb2 dib white bg-dark-blue"
+              onClick={this.uploadContacts}
+            >
+              Submit
             </div>
           </div>
-        )}
-        {contactsAllIds.length === 0 && (
-          <div className="instructions measure-wide center lh-copy pb6">
-            <h4>Upload Contacts</h4>
-            <p>
-              Upload a *.csv file with your contacts' information.
-              <br />
-              After uploading your contacts you will have the chance to add
-              relations and fix any bad data before your contacts are saved to
-              the database.
-            </p>
-            <input
-              type="file"
-              name=""
-              accept=".csv"
-              onChange={e => this.handleUploadedSpreadsheet(e.target.files[0])}
-            />
-            <UploadInstructions />
-            <HowItWorks />
-          </div>
-        )}
-        {contactsAllIds.length > 0 && (
-          <div className="uploaded">
-            <div className="uploaded-header center measure-wide flex justify-end">
-              <div
-                className="f6 link dim br1 ph3 pv2 mb2 dib white bg-dark-blue"
-                onClick={this.uploadContacts}
-              >
-                Submit
-              </div>
-            </div>
-            <ContactsList />
-          </div>
-        )}
+          <ContactsList
+            contacts={contacts}
+            sortOrder={sortOrder}
+            reverse={reverse}
+            updateContact={this.updateContact}
+            sortContacts={sortContactsBy}
+          />
+        </div>
       </div>
     )
   }
 }
 
-UploadContacts.contextType = ContactListContext
-
 export default connect(
-  state => ({}),
-  null
+  state => ({
+    sortOrder: state.tableSorter.sortOrder,
+    reverse: state.tableSorter.reverse
+  }),
+  {
+    sortContactsBy
+  }
 )(UploadContacts)

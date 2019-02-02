@@ -25,6 +25,7 @@
   display: table-cell;
   white-space: nowrap;
   padding: .5rem;
+  cursor: pointer;
 }
 
 .rolo-table-header {

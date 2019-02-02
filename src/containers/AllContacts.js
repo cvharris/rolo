@@ -1,41 +1,44 @@
-import ContactsList from 'components/ContactsTable/ContactsList';
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { updateContact as editContactInfo } from '../actions/contactsActions';
-import ContactListContext from './ContactListContext';
+import { updateContact as editContactInfo } from 'actions/contactsActions'
+import { sortContactsBy } from 'actions/contactsTableSorterActions'
+import ContactsList from 'components/ContactsTable/ContactsList'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { sortedContacts } from 'reducers/contactsTableSorter.reducer'
 
 class AllContacts extends Component {
-  componentDidMount() {
-    const { contactsAllIds, contactsById } = this.props
-
-    this.context.switchContexts(
-      contactsAllIds,
-      contactsById,
-      this.onUpdateContact
-    )
-  }
-
   onUpdateContact = contact => {
-    const { contactsById, updateContacts } = this.context
-
-    const newContactMap = { ...contactsById, [contact.id]: contact }
-    updateContacts(newContactMap)
     this.props.updateContact(contact)
   }
 
   render() {
-    return <ContactsList />
+    const {
+      contacts,
+      sortOrder,
+      reverse,
+      sortContactsBy,
+      updateContact
+    } = this.props
+
+    return (
+      <ContactsList
+        contacts={contacts}
+        sortOrder={sortOrder}
+        reverse={reverse}
+        updateContact={updateContact}
+        sortContacts={sortContactsBy}
+      />
+    )
   }
 }
 
-AllContacts.contextType = ContactListContext
-
 export default connect(
   state => ({
-    contactsAllIds: state.contacts.allIds,
-    contactsById: state.contacts.byId
+    contacts: sortedContacts(state),
+    sortOrder: state.tableSorter.sortOrder,
+    reverse: state.tableSorter.reverse
   }),
   {
+    sortContactsBy,
     updateContact: editContactInfo
   }
 )(AllContacts)
