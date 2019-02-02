@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from '@reach/router'
+import TooltipIcon from 'components/TooltipIcon'
 import firebase from 'config/firebase'
 import Contact from 'lib/Contact'
 import PropTypes from 'prop-types'
@@ -28,15 +29,23 @@ const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
   }
 
   return (
-    <div className="contact-row items-center lh-copy pa3 ph0-l bb b--black-30 tc">
+    <div className="contact-row items-center lh-copy bb b--black-30 tc">
       <Link to={`edit-contact/${contact.id}`} style={{ padding: '0 1rem' }}>
         <FontAwesomeIcon icon={['far', 'edit']} />
       </Link>
       <ContactCellText
         field={contact.firstName}
-        required={true}
         onFieldChange={val => updateContact('firstName', val)}
-      />
+      >
+        {!contact.firstName && (
+          <TooltipIcon
+            icon="exclamation-square"
+            text="First Name is required"
+            position="top"
+            color="dark-red"
+          />
+        )}
+      </ContactCellText>
       <ContactCellText
         field={contact.nickname}
         onFieldChange={val => updateContact('nickname', val)}
@@ -47,9 +56,17 @@ const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
       />
       <ContactCellText
         field={contact.lastName}
-        required={true}
         onFieldChange={val => updateContact('lastName', val)}
-      />
+      >
+        {!contact.lastName && (
+          <TooltipIcon
+            icon="exclamation-square"
+            text="Last Name is required"
+            position="top"
+            color="dark-red"
+          />
+        )}
+      </ContactCellText>
       <ContactCellText
         field={contact.suffix}
         onFieldChange={val => updateContact('suffix', val)}
@@ -61,7 +78,16 @@ const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
           { label: 'Female', value: 'F' }
         ]}
         onFieldChange={val => updateContact('gender', val)}
-      />
+      >
+        {!contact.gender && (
+          <TooltipIcon
+            icon="exclamation-square"
+            text="Gender is required"
+            position="top"
+            color="dark-red"
+          />
+        )}
+      </ContactCellSelect>
       <ContactCellText
         field={contact.phoneNumber}
         onFieldChange={val => updateContact('phoneNumber', val)}
@@ -74,7 +100,16 @@ const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
         field={transformDateVal(contact.birthday)}
         required={true}
         onFieldChange={val => updateContact('birthday', val)}
-      />
+      >
+        {!contact.birthday && (
+          <TooltipIcon
+            icon="exclamation-square"
+            text="Birthday is required"
+            position="top"
+            color="dark-red"
+          />
+        )}
+      </ContactCellTimestamp>
       <ContactCellTimestamp
         field={transformDateVal(contact.dod)}
         onFieldChange={val => updateContact('dod', val)}

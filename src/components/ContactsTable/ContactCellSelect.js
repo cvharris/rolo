@@ -19,7 +19,7 @@ class ContactCellSelect extends ContactCell {
 
   render() {
     const { updating, newValue } = this.state
-    const { multiSelect, field, options } = this.props
+    const { multiSelect, field, options, children } = this.props
 
     if (updating) {
       return (
@@ -43,9 +43,10 @@ class ContactCellSelect extends ContactCell {
     return (
       <span
         onClick={this.switchToEdit}
-        className="contact-col pointer underline-hover pl3 flex-auto f6 black-70"
+        className="contact-col pointer underline-hover pl3 flex-auto f6 black-70 relative"
       >
         {multiSelect ? field.join(', ') : field}
+        {children}
       </span>
     )
   }

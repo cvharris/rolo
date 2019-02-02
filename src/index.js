@@ -2,6 +2,8 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAddressBook,
   faEdit,
+  faExclamationSquare,
+  faExclamationTriangle,
   faListUl,
   faPlus,
   faSignOut,
@@ -27,7 +29,9 @@ library.add(
   faSignOut,
   faEdit,
   faSortAlphaUp,
-  faSortAlphaDown
+  faSortAlphaDown,
+  faExclamationSquare,
+  faExclamationTriangle
 )
 
 ReactDOM.render(

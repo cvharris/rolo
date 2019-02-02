@@ -1,7 +1,7 @@
-import firebase from 'config/firebase'
-import PropTypes from 'prop-types'
-import React from 'react'
-import ContactCell from './ContactCell'
+import firebase from 'config/firebase';
+import PropTypes from 'prop-types';
+import React from 'react';
+import ContactCell from './ContactCell';
 
 class ContactCellTimestamp extends ContactCell {
   saveEditedValue = () => {
@@ -18,7 +18,7 @@ class ContactCellTimestamp extends ContactCell {
 
   render() {
     const { updating, newValue } = this.state
-    const { field } = this.props
+    const { field, children } = this.props
 
     if (updating) {
       return (
@@ -42,9 +42,10 @@ class ContactCellTimestamp extends ContactCell {
     return (
       <span
         onClick={this.switchToEdit}
-        className="contact-col pl3 flex-auto f6 pointer black-70"
+        className="contact-col pl3 flex-auto f6 pointer black-70 relative"
       >
         {field}
+        {children}
       </span>
     )
   }
