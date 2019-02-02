@@ -3,7 +3,6 @@ import LoadingScreen from 'components/LoadingScreen'
 import Contact from 'lib/Contact'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { getTypeAheadOptions } from 'reducers/contactsReducer'
 import {
   removeContact,
   setUserContacts,
@@ -83,8 +82,7 @@ class Rolodex extends Component {
 export default connect(
   state => ({
     contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId]),
-    contactsById: state.contacts.byId,
-    typeaheadOptions: getTypeAheadOptions(state)
+    contactsById: state.contacts.byId
   }),
   {
     updateContactsList: setUserContacts,

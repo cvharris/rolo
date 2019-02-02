@@ -1,8 +1,8 @@
-import { db } from 'config/firebase';
-import PropTypes from 'prop-types';
-import React from 'react';
-import Select from 'react-select';
-import ContactCell from './ContactCell';
+import { db } from 'config/firebase'
+import PropTypes from 'prop-types'
+import React from 'react'
+import Select from 'react-select'
+import ContactCell from './ContactCell'
 
 class ContactCellContactSelect extends ContactCell {
   createContactRef = id => db.doc(`contacts/${id}`)
@@ -10,7 +10,13 @@ class ContactCellContactSelect extends ContactCell {
   saveEditedValue = option => {
     const { onFieldChange, multiSelect } = this.props
 
-    const newVal = multiSelect ? option ? option.map(opt => this.createContactRef(opt.value)) : [] : option ? this.createContactRef(option.value) : null
+    const newVal = multiSelect
+      ? option
+        ? option.map(opt => this.createContactRef(opt.value))
+        : []
+      : option
+      ? this.createContactRef(option.value)
+      : null
 
     onFieldChange(newVal)
 
@@ -28,6 +34,8 @@ class ContactCellContactSelect extends ContactCell {
             options={options}
             blurInputOnSelect={false}
             closeMenuOnSelect={false}
+            getOptionLabel={option => `${option.firstName} ${option.lastName}`}
+            getOptionValue={option => option.id}
             isClearable={!options}
             ref={this.inputRef}
             value={newValue}
@@ -46,15 +54,21 @@ class ContactCellContactSelect extends ContactCell {
         className="contact-col pointer underline-hover pl3 flex-auto f6 black-70"
       >
         {multiSelect
-          ? field.map(fi => fi.label).join(', ')
-          : field.label}
+          ? field.map(fi => `${fi.firstName} ${fi.lastName}`).join(', ')
+          : field
+          ? `${field.firstName} ${field.lastName}`
+          : ''}
       </span>
     )
   }
 }
 
 ContactCellContactSelect.propTypes = {
-  field: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  field: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.object,
+    PropTypes.array
+  ]),
   multiSelect: PropTypes.bool,
   options: PropTypes.array,
   onFieldChange: PropTypes.func.isRequired

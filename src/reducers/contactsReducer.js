@@ -1,6 +1,9 @@
-import mapContactsToSelectOpts from 'lib/mapContactsToSelectOpts';
-import { createSelector } from 'reselect';
-import { ADD_CONTACT, REMOVE_CONTACT, SET_USER_CONTACTS, UPDATE_CONTACT } from '../config/constants';
+import {
+  ADD_CONTACT,
+  REMOVE_CONTACT,
+  SET_USER_CONTACTS,
+  UPDATE_CONTACT
+} from '../config/constants'
 
 // Initial State
 export const initialState = {
@@ -37,8 +40,3 @@ export default (state = initialState, action) => {
 // Getters
 export const allContacts = state =>
   state.contacts.allIds.map(contactId => state.contacts.byId[contactId])
-
-export const getTypeAheadOptions = createSelector(
-  allContacts,
-  mapContactsToSelectOpts
-)
