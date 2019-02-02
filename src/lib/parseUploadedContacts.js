@@ -4,7 +4,6 @@ import {
   PhoneNumberFormat as PNF,
   PhoneNumberUtil
 } from 'google-libphonenumber'
-import Contact from 'lib/Contact'
 import Papa from 'papaparse'
 
 export default (file, onStep, onComplete, onError) => {
@@ -20,12 +19,6 @@ export default (file, onStep, onComplete, onError) => {
       clientId: contact.id,
       id: docRef.id
     }
-  }
-
-  const updateExistingContact = (contact, foundContact) => {
-    contact.clientId = contact.id
-    contact.id = foundContact.id
-    return new Contact(Object.assign(foundContact, contact))
   }
 
   Papa.parse(file, {
