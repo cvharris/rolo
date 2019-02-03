@@ -9,7 +9,9 @@ const sortContacts = (contacts, sorter, reverse) =>
       } else if (sorter === 'lastName') {
         return [contact.lastName, contact.firstName]
       }
-      return contact[sorter] ? contact[sorter] : reverse ? '' : undefined
+      return contact[sorter]
+        ? [contact[sorter], contact.lastName, contact.firstName]
+        : undefined
     },
     reverse ? 'desc' : 'asc'
   )

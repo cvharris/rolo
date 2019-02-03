@@ -44,12 +44,25 @@
 
 .contact-row {
   display: table-row;
+
+  &:nth-child(even) {
+    background: #ededed;
+  }
+
+  &:hover {
+    background: #dedede;
+  }
+
+  &.contact-invalid {
+    background: rgba(#FF725C, 0.3);
+
+    &:hover {
+    background: rgba(#FF725C, 0.5);
+    }
+  }
 }
 
-.contact-row:nth-child(even) {
-  background: #ededed;
+.disabled-button {
+  cursor: not-allowed;
 }
 
-.contact-row:hover {
-  background: #dedede;
-}

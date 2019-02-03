@@ -12,7 +12,13 @@ import ContactCellSelect from './ContactCellSelect'
 import ContactCellText from './ContactCellText'
 import ContactCellTimestamp from './ContactCellTimestamp'
 
-const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
+const ContactRow = ({
+  contact,
+  updateContact,
+  contactsById,
+  allContacts,
+  invalid
+}) => {
   const transformDateVal = dateVal => {
     if (dateVal) {
       if (dateVal instanceof firebase.firestore.Timestamp) {
@@ -29,7 +35,11 @@ const ContactRow = ({ contact, updateContact, contactsById, allContacts }) => {
   }
 
   return (
-    <div className="contact-row items-center lh-copy bb b--black-30 tc">
+    <div
+      className={`contact-row items-center lh-copy bb b--black-30 tc${
+        invalid ? ' contact-invalid' : ''
+      }`}
+    >
       <Link to={`edit-contact/${contact.id}`} style={{ padding: '0 1rem' }}>
         <FontAwesomeIcon icon={['far', 'edit']} />
       </Link>

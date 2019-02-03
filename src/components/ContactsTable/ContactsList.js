@@ -1,5 +1,6 @@
 import Contact from 'lib/Contact'
 import contactFields from 'lib/contactFields'
+import isContactInvalid from 'lib/isContactInvalid'
 import React from 'react'
 import ContactListHeader from './ContactListHeader'
 import ContactRow from './ContactRow'
@@ -14,6 +15,13 @@ const ContactsList = ({
   if (!contacts.length) {
     return <h1>You have no contacts!</h1>
   }
+
+  const invalidContacts = contacts.reduce((map, contact) => {
+    if (isContactInvalid(contact)) {
+      map[contact.id] = true
+    }
+    return map
+  }, {})
 
   return (
     <div className="rolo-table">
@@ -35,6 +43,7 @@ const ContactsList = ({
           <ContactRow
             contact={contact}
             key={contact.id}
+            invalid={invalidContacts[contact.id]}
             updateContact={(f, v) =>
               updateContact(new Contact({ ...contact, [f]: v }))
             }
