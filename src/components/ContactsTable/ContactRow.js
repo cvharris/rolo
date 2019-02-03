@@ -61,6 +61,10 @@ const ContactRow = ({
         onFieldChange={val => updateContact('nickname', val)}
       />
       <ContactCellText
+        field={contact.middleName}
+        onFieldChange={val => updateContact('middleName', val)}
+      />
+      <ContactCellText
         field={contact.maidenName}
         onFieldChange={val => updateContact('maidenName', val)}
       />

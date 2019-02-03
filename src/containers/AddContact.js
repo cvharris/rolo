@@ -1,4 +1,4 @@
-import { db } from 'config/firebase'
+import firebase, { db } from 'config/firebase'
 import Contact from 'lib/Contact'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
@@ -13,6 +13,7 @@ class AddContact extends Component {
         contact={this.props.newContact}
         onNameUpdate={this.props.updateCurrentContactName}
         onContactSubmit={this.props.addContact}
+        submitButtonText="Create New Contact!"
       />
     )
   }
@@ -28,8 +29,16 @@ const mapDispatchToProps = (dispatch, props) => ({
   addContact: newContact => {
     const readyContact = {
       ...newContact,
+      birthday: firebase.firestore.Timestamp.fromDate(
+        new Date(newContact.birthday)
+      ),
       spouse: db.doc(`/contacts/${newContact.spouse.value}`),
-      children: db.doc(`/contacts/${newContact.children.value}`)
+      children: newContact.children.map(child =>
+        db.doc(`/contacts/${child.value}`)
+      ),
+      parents: newContact.parents.map(parent =>
+        db.doc(`/contacts/${parent.value}`)
+      )
     }
     dispatch(pushContact(readyContact))
     props.history.push('/')

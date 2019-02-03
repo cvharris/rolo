@@ -1,6 +1,7 @@
 export default {
   firstName: 'First Name',
   nickname: 'Nickname',
+  middleName: 'Middle Name',
   maidenName: 'Maiden Name',
   lastName: 'Last Name',
   suffix: 'Suffix',
