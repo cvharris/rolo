@@ -4,11 +4,14 @@ import HowItWorks from 'components/HowItWorks'
 import UploadInstructions from 'components/UploadInstructions'
 import { db } from 'config/firebase'
 import Contact from 'lib/Contact'
+import isContactInvalid from 'lib/isContactInvalid'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
 import sortContacts from 'lib/sortContacts'
+import memoize from 'lodash/memoize'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import memoize from 'lodash/memoize'
+
+const sortAllContacts = memoize(sortContacts)
 
 class UploadContacts extends Component {
   state = {
@@ -186,22 +189,30 @@ class UploadContacts extends Component {
 
     const { sortOrder, reverse, sortContactsBy } = this.props
 
-    const contacts = memoize(sortContacts(
+    const contacts = sortAllContacts(
       contactIds.map(cId => contactsById[cId]),
       sortOrder,
       reverse
-    ))
+    )
+
+    const readyToUpload = contacts.every(con => !isContactInvalid(con))
 
     return (
       <div className="pt3">
         <div className="uploaded">
           <div className="uploaded-header center measure-wide flex justify-end">
-            <div
-              className="f6 link dim br1 ph3 pv2 mb2 dib white bg-dark-blue"
+            <button
+              className={`f6 link br1 ph3 pv2 mb2 dib ${
+                readyToUpload
+                  ? 'pointer white bg-dark-blue dim'
+                  : 'disabled-button mid-gray bg-moon-gray'
+              }`}
+              type="button"
               onClick={this.uploadContacts}
+              disabled={!readyToUpload}
             >
               Submit
-            </div>
+            </button>
           </div>
           <ContactsList
             contacts={contacts}
