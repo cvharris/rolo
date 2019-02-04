@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { updateContact } from '../actions/contactsActions'
 import { setCurrentContact } from '../actions/currentContactActions'
 import ContactForm from '../components/ContactForm'
-import { updateContact } from '../actions/contactsActions'
 
 class EditContact extends Component {
   state = {
@@ -11,9 +10,9 @@ class EditContact extends Component {
   }
 
   componentDidMount() {
-    const { setCurrentContact, allContactsById, match } = this.props
+    const { setCurrentContact, allContactsById, contactId } = this.props
 
-    setCurrentContact(allContactsById[match.params.contactId], allContactsById)
+    setCurrentContact(allContactsById[contactId], allContactsById)
     this.setState({
       fetchingContact: false
     })
@@ -34,12 +33,10 @@ class EditContact extends Component {
   }
 }
 
-export default withRouter(
-  connect(
-    state => ({
-      contact: state.currentContact,
-      allContactsById: state.contacts.byId
-    }),
-    { setCurrentContact, updateContact }
-  )(EditContact)
-)
+export default connect(
+  state => ({
+    contact: state.currentContact,
+    allContactsById: state.contacts.byId
+  }),
+  { setCurrentContact, updateContact }
+)(EditContact)

@@ -3,7 +3,6 @@ import Contact from 'lib/Contact'
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import { pushContact } from '../actions/contactsActions'
 import ContactForm from '../components/ContactForm'
 
@@ -46,11 +45,9 @@ const mapDispatchToProps = (dispatch, props) => ({
   }
 })
 
-export default withRouter(
-  connect(
-    state => ({
-      newContact: state.currentContact
-    }),
-    mapDispatchToProps
-  )(AddContact)
-)
+export default connect(
+  state => ({
+    newContact: state.currentContact
+  }),
+  mapDispatchToProps
+)(AddContact)

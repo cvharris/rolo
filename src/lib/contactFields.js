@@ -1,8 +1,10 @@
 export default {
   firstName: 'First Name',
+  nickname: 'Nickname',
   middleName: 'Middle Name',
   maidenName: 'Maiden Name',
   lastName: 'Last Name',
+  suffix: 'Suffix',
   gender: 'M/F',
   phoneNumber: 'Phone Number',
   email: 'Email Address',

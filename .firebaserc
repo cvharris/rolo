@@ -1,5 +1,6 @@
 {
   "projects": {
-    "dev": "rolo-1014"
+    "dev": "rolo-1014",
+    "default": "rolo-1014"
   }
 }

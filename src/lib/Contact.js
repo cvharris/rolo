@@ -1,25 +1,26 @@
 export default class Contact {
-  // TODO: check if firebase timestamp, convert to Date
   constructor({
     id = '-1',
+    clientId = undefined,
     firstName = '',
     lastName = '',
     phoneNumber = '',
     email = '',
-    gender = '', //drop down selector
-    address = null, //own compoent with multiple fields
-    birthday = null, //date picker
+    gender = '', // drop down selector
+    address = undefined, // own compoent with multiple fields
+    birthday = undefined, // date picker
     nickname = '',
     middleName = '',
     maidenName = '',
-    spouse = null, //auto complete select list
-    parents = [], //auto complete select list
-    children = [], //auto complete select list
+    spouse = undefined, // auto complete select list
+    parents = [], // auto complete select list
+    children = [], // auto complete select list
     prefix = '',
     suffix = '',
-    dod = null
+    dod = undefined
   }) {
     this.id = id
+    this.clientId = clientId
     this.firstName = firstName
     this.lastName = lastName
     this.phoneNumber = phoneNumber
@@ -55,7 +56,8 @@ export default class Contact {
       children: this.children,
       prefix: this.prefix,
       suffix: this.suffix,
-      dod: this.dod
+      dod: this.dod,
+      clientId: this.clientId
     }
   }
 }

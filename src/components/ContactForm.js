@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { getTypeAheadOptions } from 'reducers/contactsReducer'
+import { allContacts } from 'reducers/contactsReducer'
 
 class ContactForm extends Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class ContactForm extends Component {
   }
 
   render() {
-    const { submitButtonText } = this.props
+    const { contactsById, submitButtonText } = this.props
     const { firstName, lastName } = this.state
     return (
       <div className="contact-form">
@@ -188,15 +188,33 @@ class ContactForm extends Component {
             </label>
             <label className="f6 b db mt2">Spouse</label>
             <Select
-              options={this.props.typeAheadOptions}
-              value={this.state.spouse}
+              options={this.props.contacts}
+              value={
+                this.state.spouse
+                  ? {
+                      ...this.state.spouse,
+                      ...contactsById[this.state.spouse.id]
+                    }
+                  : ''
+              }
+              getOptionLabel={option =>
+                `${option.firstName} ${option.lastName}`
+              }
+              getOptionValue={option => option.id}
               onChange={option => this.handleSelectChange(option, 'spouse')}
               name="spouse"
             />
             <label className="f6 b db mt2">Children</label>
             <Select
-              options={this.props.typeAheadOptions}
-              value={this.state.children}
+              options={this.props.contacts}
+              value={this.state.children.map(conRef => ({
+                ...conRef,
+                ...contactsById[conRef.id]
+              }))}
+              getOptionLabel={option =>
+                `${option.firstName} ${option.lastName}`
+              }
+              getOptionValue={option => option.id}
               onChange={option => this.handleSelectChange(option, 'children')}
               name="children"
               isMulti={true}
@@ -204,8 +222,15 @@ class ContactForm extends Component {
 
             <label className="f6 b db mt2">Parents</label>
             <Select
-              options={this.props.typeAheadOptions}
-              value={this.state.parents}
+              options={this.props.contacts}
+              value={this.state.parents.map(conRef => ({
+                ...conRef,
+                ...contactsById[conRef.id]
+              }))}
+              getOptionLabel={option =>
+                `${option.firstName} ${option.lastName}`
+              }
+              getOptionValue={option => option.id}
               onChange={option => this.handleSelectChange(option, 'parents')}
               name="parents"
               isMulti={true}
@@ -227,10 +252,11 @@ class ContactForm extends Component {
 ContactForm.propTypes = {
   contact: PropTypes.instanceOf(Contact),
   onContactSubmit: PropTypes.func,
-  typeAheadOptions: PropTypes.array,
+  contacts: PropTypes.array,
   submitButtonText: PropTypes.string
 }
 
 export default connect(state => ({
-  typeAheadOptions: getTypeAheadOptions(state)
+  contacts: allContacts(state),
+  contactsById: state.contacts.byId
 }))(ContactForm)

@@ -1,17 +1,16 @@
+import { Router } from '@reach/router'
 import LoadingScreen from 'components/LoadingScreen'
 import Contact from 'lib/Contact'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Route } from 'react-router'
-import { withRouter } from 'react-router-dom'
 import {
   removeContact,
   setUserContacts,
   updateContact as editContactInfo
 } from '../actions/contactsActions'
-import ContactsList from '../components/ContactsList'
 import firebase, { db } from '../config/firebase'
 import AddContact from './AddContact'
+import AllContacts from './AllContacts'
 import EditContact from './EditContact'
 import Sidebar from './Sidebar'
 import UploadContacts from './UploadContacts'
@@ -21,7 +20,11 @@ class Rolodex extends Component {
     loadingContacts: true
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.getAllContactsForUser()
+  }
+
+  getAllContactsForUser = async () => {
     const { updateContactsList } = this.props
     try {
       const user = await db
@@ -54,45 +57,36 @@ class Rolodex extends Component {
 
   render() {
     const { loadingContacts } = this.state
-    const { handleLogout, contacts, removeContact, updateContact } = this.props
+    const { handleLogout } = this.props
 
     if (loadingContacts) {
       return <LoadingScreen />
     }
 
     return (
-      <div>
+      <div id="app">
         <Sidebar handleLogout={handleLogout} />
         <div className="app-body">
-          <Route
-            exact
-            path="/"
-            render={() => (
-              <ContactsList
-                contacts={contacts}
-                onRemoveContact={removeContact}
-                updateContact={updateContact}
-              />
-            )}
-          />
-          <Route path="/new-contact" component={AddContact} />
-          <Route path="/edit-contact/:contactId" component={EditContact} />
-          <Route path="/upload-contacts" component={UploadContacts} />
+          <Router>
+            <AllContacts path="/" onNavBack={this.getAllContactsForUser} />
+            <AddContact path="new-contact" />
+            <EditContact path="edit-contact/:contactId" />
+            <UploadContacts path="upload-contacts" />
+          </Router>
         </div>
       </div>
     )
   }
 }
 
-export default withRouter(
-  connect(
-    state => ({
-      contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId])
-    }),
-    {
-      updateContactsList: setUserContacts,
-      updateContact: editContactInfo,
-      removeContact
-    }
-  )(Rolodex)
-)
+export default connect(
+  state => ({
+    contacts: state.contacts.allIds.map(cId => state.contacts.byId[cId]),
+    contactsById: state.contacts.byId
+  }),
+  {
+    updateContactsList: setUserContacts,
+    updateContact: editContactInfo,
+    removeContact
+  }
+)(Rolodex)

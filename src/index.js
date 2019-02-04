@@ -2,9 +2,13 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faAddressBook,
   faEdit,
+  faExclamationSquare,
+  faExclamationTriangle,
   faListUl,
   faPlus,
   faSignOut,
+  faSortAlphaDown,
+  faSortAlphaUp,
   faSpinner,
   faUpload
 } from '@fortawesome/pro-regular-svg-icons'
@@ -12,10 +16,8 @@ import configureStore from 'config/store'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { BrowserRouter } from 'react-router-dom'
+import 'styles/index.scss'
 import App from './App'
-import './App.css'
-import './index.css'
 import * as serviceWorker from './serviceWorker'
 
 library.add(
@@ -25,14 +27,16 @@ library.add(
   faListUl,
   faPlus,
   faSignOut,
-  faEdit
+  faEdit,
+  faSortAlphaUp,
+  faSortAlphaDown,
+  faExclamationSquare,
+  faExclamationTriangle
 )
 
 ReactDOM.render(
   <Provider store={configureStore()}>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </Provider>,
   document.getElementById('root')
 )
