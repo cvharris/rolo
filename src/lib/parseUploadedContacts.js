@@ -5,14 +5,16 @@ import {
   PhoneNumberUtil
 } from 'google-libphonenumber'
 import Papa from 'papaparse'
+import Address from './Address'
 
 export default (file, onStep, onComplete, onError) => {
   // Build the list of uploaded contacts
   const contacts = []
+  const addresses = {}
   const phoneUtil = PhoneNumberUtil.getInstance()
 
-  const createNewContact = (contact, docRef) => {
-    docRef = db.collection('contacts').doc()
+  const createNewContact = contact => {
+    const docRef = db.collection('contacts').doc()
     return {
       ...contact,
       uploadedBy: firebase.auth().currentUser.uid,
@@ -29,10 +31,19 @@ export default (file, onStep, onComplete, onError) => {
         parser.abort()
         consola.error(row.errors)
       }
-      const contact = row.data[0]
-      // Check if contact already exists
-      let docRef = db.collection('contacts').doc(contact.id)
-      contacts.push(createNewContact(contact, docRef))
+      let contact = row.data[0]
+
+      // Transform addresses
+      const address = new Address(contact)
+      const addressHash = address.toHash()
+
+      if (!addresses[addressHash]) {
+        addresses[addressHash] = address
+      }
+
+      contact.address = addressHash
+
+      contacts.push(createNewContact(contact))
       onStep(row.meta.cursor)
     },
     transform: (val, col) => {
@@ -62,7 +73,7 @@ export default (file, onStep, onComplete, onError) => {
       }
     },
     complete: () => {
-      onComplete(contacts)
+      onComplete(contacts, addresses)
     },
     error: (err, file, inputEl, reason) => {
       consola.error('err in the upload')
