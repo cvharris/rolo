@@ -6,13 +6,20 @@ import { connect } from 'react-redux'
 import { sortedContacts } from 'reducers/contactsTableSorter.reducer'
 
 class AllContacts extends Component {
+  componentDidMount() {
+    const { onNavBack } = this.props
+    onNavBack()
+  }
+
   onUpdateContact = contact => {
     this.props.updateContact(contact)
   }
 
   render() {
+    // TODO: Render a loading spinner when waiting to get contacts again
     const {
       contacts,
+      addresses,
       sortOrder,
       reverse,
       sortContactsBy,
@@ -22,6 +29,7 @@ class AllContacts extends Component {
     return (
       <ContactsList
         contacts={contacts}
+        addresses={addresses}
         sortOrder={sortOrder}
         reverse={reverse}
         updateContact={updateContact}
@@ -34,6 +42,7 @@ class AllContacts extends Component {
 export default connect(
   state => ({
     contacts: sortedContacts(state),
+    addresses: state.addresses.byId,
     sortOrder: state.tableSorter.sortOrder,
     reverse: state.tableSorter.reverse
   }),
