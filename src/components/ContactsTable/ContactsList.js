@@ -7,6 +7,7 @@ import ContactRow from './ContactRow'
 
 const ContactsList = ({
   contacts,
+  addresses,
   updateContact,
   sortOrder,
   reverse,
@@ -42,6 +43,7 @@ const ContactsList = ({
         {contacts.map(contact => (
           <ContactRow
             contact={contact}
+            address={addresses[contact.address]}
             key={contact.id}
             invalid={invalidContacts[contact.id]}
             updateContact={(f, v) =>

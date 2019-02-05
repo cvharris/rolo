@@ -14,7 +14,9 @@ import ContactCellTimestamp from './ContactCellTimestamp'
 
 const ContactRow = ({
   contact,
+  address,
   updateContact,
+  updateAddress,
   contactsById,
   allContacts,
   invalid
@@ -124,6 +126,26 @@ const ContactRow = ({
           />
         )}
       </ContactCellTimestamp>
+      <ContactCellText
+        field={address ? address.street1 : ''}
+        onFieldChange={val => updateAddress('street1', val)}
+      />
+      <ContactCellText
+        field={address ? address.street2 : ''}
+        onFieldChange={val => updateAddress('street2', val)}
+      />
+      <ContactCellText
+        field={address ? address.city : ''}
+        onFieldChange={val => updateAddress('city', val)}
+      />
+      <ContactCellText
+        field={address ? address.state : ''}
+        onFieldChange={val => updateAddress('state', val)}
+      />
+      <ContactCellText
+        field={address ? address.zip : ''}
+        onFieldChange={val => updateAddress('zip', val)}
+      />
       <ContactCellTimestamp
         field={transformDateVal(contact.dod)}
         onFieldChange={val => updateContact('dod', val)}

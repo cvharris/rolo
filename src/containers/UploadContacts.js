@@ -6,17 +6,14 @@ import { db } from 'config/firebase'
 import Contact from 'lib/Contact'
 import isContactInvalid from 'lib/isContactInvalid'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
-import sortContacts from 'lib/sortContacts'
-import memoize from 'lodash/memoize'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
-const sortAllContacts = memoize(sortContacts)
+import { sortedContacts } from 'reducers/contactsTableSorter.reducer'
+import { setUserContacts } from '../actions/contactsActions'
 
 class UploadContacts extends Component {
   state = {
-    contactIds: [],
-    contactsById: {},
+    addresses: {},
     fileSize: 1,
     uploading: false,
     uploadProgress: 0
@@ -24,27 +21,38 @@ class UploadContacts extends Component {
 
   componentDidMount() {
     // TODO: store uploaded contacts in localstorage until after upload
-    const uploadedContacts = JSON.parse(
-      localStorage.getItem('uploadedContacts')
-    )
+    // const uploadedContacts = JSON.parse(
+    //   localStorage.getItem('uploadedContacts')
+    // )
+    const { updateContactsList } = this.props
+    updateContactsList({ allIds: [], byId: {} })
   }
 
   uploadContacts = async () => {
-    const { contactIds, contactsById } = this.state
-    const { navigate } = this.props
-    const uploadedContacts = contactIds.map(cId => contactsById[cId])
+    const { addresses } = this.state
+    const { contacts, navigate } = this.props
 
     this.setState(prevState => ({
       ...prevState,
-      fileSize: contactIds.length,
+      fileSize: contacts.length,
       uploading: true
     }))
 
     const updateAll = db.batch()
-    uploadedContacts.forEach(contact => {
+
+    // Create Contacts
+    contacts.forEach(contact => {
       updateAll.set(
         db.collection('contacts').doc(contact.id),
         contact.toObject()
+      )
+    })
+
+    // Create Addresses
+    Object.keys(addresses).forEach(addressHash => {
+      updateAll.set(
+        db.collection('addresses').doc(addressHash),
+        addresses[addressHash.toObject()]
       )
     })
 
@@ -54,8 +62,7 @@ class UploadContacts extends Component {
 
     this.setState(
       {
-        contactIds: [],
-        contactsById: {},
+        addresses: {},
         uploadProgress: 0,
         fileSize: 1,
         uploading: false
@@ -82,31 +89,35 @@ class UploadContacts extends Component {
     }))
   }
 
-  onUploadComplete = contacts => {
-    const mappedContacts = contacts.map((contact, i, arr) => {
-      return new Contact({
-        ...contact,
-        children: contact.children.map(child =>
-          this.mapClientIdToFirebaseId(child, arr)
-        ),
-        parents: contact.parents.map(parent =>
-          this.mapClientIdToFirebaseId(parent, arr)
-        ),
-        spouse: contact.spouse
-          ? this.mapClientIdToFirebaseId(contact.spouse, arr)
-          : null
-      })
-    })
+  onUploadComplete = (contacts, addresses) => {
+    const { updateContactsList } = this.props
     // TODO: save uploaded Contacts in localStorage
     // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
-    const uploadedContactsMap = mappedContacts.reduce((map, contact) => {
-      map[contact.id] = contact
-      return map
-    }, {})
+    const uploadedContacts = contacts.reduce(
+      (state, contact, i, arr) => {
+        const mappedContact = new Contact({
+          ...contact,
+          children: contact.children.map(child =>
+            this.mapClientIdToFirebaseId(child, arr)
+          ),
+          parents: contact.parents.map(parent =>
+            this.mapClientIdToFirebaseId(parent, arr)
+          ),
+          spouse: contact.spouse
+            ? this.mapClientIdToFirebaseId(contact.spouse, arr)
+            : null
+        })
+        state.byId[mappedContact.id] = mappedContact
+        state.allIds.push(mappedContact.id)
+        return state
+      },
+      { allIds: [], byId: {} }
+    )
+
+    updateContactsList(uploadedContacts)
 
     this.setState({
-      contactIds: mappedContacts.map(con => con.id),
-      contactsById: uploadedContactsMap,
+      addresses,
       uploadProgress: 0,
       fileSize: 1,
       uploading: false
@@ -137,7 +148,7 @@ class UploadContacts extends Component {
   }
 
   updateContact = contact => {
-    const { contactsById } = this.state
+    const { contactsById } = this.props
     const newContactMap = { ...contactsById, [contact.id]: contact }
     this.setState(prevState => ({
       ...prevState,
@@ -162,9 +173,9 @@ class UploadContacts extends Component {
       )
     }
 
-    const { contactIds, contactsById } = this.state
+    const { contacts } = this.props
 
-    if (contactIds.length === 0) {
+    if (contacts.length === 0) {
       return (
         <div className="instructions measure-wide center lh-copy pb6">
           <h4>Upload Contacts</h4>
@@ -188,12 +199,7 @@ class UploadContacts extends Component {
     }
 
     const { sortOrder, reverse, sortContactsBy } = this.props
-
-    const contacts = sortAllContacts(
-      contactIds.map(cId => contactsById[cId]),
-      sortOrder,
-      reverse
-    )
+    const { addresses } = this.state
 
     const readyToUpload = contacts.every(con => !isContactInvalid(con))
 
@@ -216,6 +222,7 @@ class UploadContacts extends Component {
           </div>
           <ContactsList
             contacts={contacts}
+            addresses={addresses}
             sortOrder={sortOrder}
             reverse={reverse}
             updateContact={this.updateContact}
@@ -229,10 +236,13 @@ class UploadContacts extends Component {
 
 export default connect(
   state => ({
+    contacts: sortedContacts(state),
+    contactsById: state.contacts.byId,
     sortOrder: state.tableSorter.sortOrder,
     reverse: state.tableSorter.reverse
   }),
   {
+    updateContactsList: setUserContacts,
     sortContactsBy
   }
 )(UploadContacts)
