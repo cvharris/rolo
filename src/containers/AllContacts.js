@@ -7,8 +7,10 @@ import { sortedContacts } from 'reducers/contactsTableSorter.reducer'
 
 class AllContacts extends Component {
   componentDidMount() {
-    const { onNavBack } = this.props
-    onNavBack()
+    const { onNavBack, fromState } = this.props
+    if (fromState !== 'all') {
+      onNavBack()
+    }
   }
 
   onUpdateContact = contact => {
@@ -42,6 +44,7 @@ class AllContacts extends Component {
 export default connect(
   state => ({
     contacts: sortedContacts(state),
+    fromState: state.contacts.fromState,
     addresses: state.addresses.byId,
     sortOrder: state.tableSorter.sortOrder,
     reverse: state.tableSorter.reverse

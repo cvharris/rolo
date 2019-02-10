@@ -1,19 +1,17 @@
-import { Router } from '@reach/router'
-import LoadingScreen from 'components/LoadingScreen'
-import Contact from 'lib/Contact'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import {
-  removeContact,
-  setUserContacts,
-  updateContact as editContactInfo
-} from '../actions/contactsActions'
-import firebase, { db } from '../config/firebase'
-import AddContact from './AddContact'
-import AllContacts from './AllContacts'
-import EditContact from './EditContact'
-import Sidebar from './Sidebar'
-import UploadContacts from './UploadContacts'
+import { Router } from '@reach/router';
+import { setAllAddresses } from 'actions/addressesActions';
+import { removeContact, setFromState, setUserContacts, updateContact as editContactInfo } from 'actions/contactsActions';
+import LoadingScreen from 'components/LoadingScreen';
+import firebase, { db } from 'config/firebase';
+import Address from 'lib/Address';
+import Contact from 'lib/Contact';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import AddContact from './AddContact';
+import AllContacts from './AllContacts';
+import EditContact from './EditContact';
+import Sidebar from './Sidebar';
+import UploadContacts from './UploadContacts';
 
 class Rolodex extends Component {
   state = {
@@ -21,6 +19,8 @@ class Rolodex extends Component {
   }
 
   componentDidMount() {
+    const { setFromState } = this.props
+    setFromState('all')
     this.getAllContactsForUser()
   }
 
@@ -35,7 +35,7 @@ class Rolodex extends Component {
       const relatives = await Promise.all(
         user.get('relatives').map(relativeRef => db.doc(relativeRef.path).get())
       )
-      const contacts = relatives.reduce(
+      const contactsState = relatives.reduce(
         (newState, doc) => {
           const contact = new Contact({ ...doc.data(), id: doc.id })
           newState.byId[contact.id] = contact
@@ -44,8 +44,33 @@ class Rolodex extends Component {
         },
         { allIds: [], byId: {} }
       )
+
+      // Now go get addresses? Man there's gotta be a better way to handle this...
+      const addressPromises = Object.values(contactsState.byId).reduce(
+        (allAddresses, contact) => {
+          if (contact.address) {
+            allAddresses.push(contact.address.get())
+          }
+          return allAddresses
+        },
+        []
+      )
+      const addressSnaps = await Promise.all(addressPromises)
+
+      const addressesState = addressSnaps.reduce(
+        (addressState, doc) => {
+          const address = new Address(doc.data())
+          const hash = address.toHash()
+          addressState.byId[hash] = address
+          addressState.allIds.push(hash)
+          return addressState
+        },
+        { allIds: [], byId: {} }
+      )
+
       // Update state with this (not resetting store)
-      updateContactsList(contacts)
+      updateContactsList(contactsState)
+      setAllAddresses(addressesState)
     } catch (e) {
       // TODO: Show loading error message
     }
@@ -87,6 +112,8 @@ export default connect(
   {
     updateContactsList: setUserContacts,
     updateContact: editContactInfo,
+    setAllAddresses,
+    setFromState,
     removeContact
   }
 )(Rolodex)
