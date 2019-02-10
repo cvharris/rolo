@@ -1,12 +1,16 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Link } from '@reach/router'
+import { addAddress } from 'actions/addressesActions'
 import TooltipIcon from 'components/TooltipIcon'
 import firebase from 'config/firebase'
+import Address from 'lib/Address'
 import Contact from 'lib/Contact'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { connect } from 'react-redux'
+import { allAddresses } from 'reducers/addresses.reducer'
 import { allContacts } from 'reducers/contactsReducer'
+import ContactCellAddress from './ContactCellAddress'
 import ContactCellContactSelect from './ContactCellContactSelect'
 import ContactCellSelect from './ContactCellSelect'
 import ContactCellText from './ContactCellText'
@@ -14,9 +18,10 @@ import ContactCellTimestamp from './ContactCellTimestamp'
 
 const ContactRow = ({
   contact,
-  address,
+  addresses,
+  addressesById,
   updateContact,
-  updateAddress,
+  createAddress,
   contactsById,
   allContacts,
   invalid
@@ -126,25 +131,13 @@ const ContactRow = ({
           />
         )}
       </ContactCellTimestamp>
-      <ContactCellText
-        field={address ? address.street1 : ''}
-        onFieldChange={val => updateAddress('street1', val)}
-      />
-      <ContactCellText
-        field={address ? address.street2 : ''}
-        onFieldChange={val => updateAddress('street2', val)}
-      />
-      <ContactCellText
-        field={address ? address.city : ''}
-        onFieldChange={val => updateAddress('city', val)}
-      />
-      <ContactCellText
-        field={address ? address.state : ''}
-        onFieldChange={val => updateAddress('state', val)}
-      />
-      <ContactCellText
-        field={address ? address.zip : ''}
-        onFieldChange={val => updateAddress('zip', val)}
+      <ContactCellAddress
+        field={
+          contact.address ? addressesById[contact.address] : new Address({})
+        }
+        onFieldChange={val => updateContact('address', val)}
+        options={addresses}
+        onAddressCreation={createAddress}
       />
       <ContactCellTimestamp
         field={transformDateVal(contact.dod)}
@@ -186,7 +179,14 @@ ContactRow.propTypes = {
   updateContact: PropTypes.func.isRequired
 }
 
-export default connect(state => ({
-  contactsById: state.contacts.byId,
-  allContacts: allContacts(state)
-}))(ContactRow)
+export default connect(
+  state => ({
+    contactsById: state.contacts.byId,
+    addresses: allAddresses(state),
+    addressesById: state.addresses.byId,
+    allContacts: allContacts(state)
+  }),
+  {
+    createAddress: addAddress
+  }
+)(ContactRow)

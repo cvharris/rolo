@@ -1,3 +1,5 @@
+import { setAllAddresses } from 'actions/addressesActions'
+import { setUserContacts, updateUploadedContact } from 'actions/contactsActions'
 import { sortContactsBy } from 'actions/contactsTableSorterActions'
 import ContactsList from 'components/ContactsTable/ContactsList'
 import HowItWorks from 'components/HowItWorks'
@@ -8,12 +10,11 @@ import isContactInvalid from 'lib/isContactInvalid'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { allAddresses } from 'reducers/addresses.reducer'
 import { sortedContacts } from 'reducers/contactsTableSorter.reducer'
-import { setUserContacts } from '../actions/contactsActions'
 
 class UploadContacts extends Component {
   state = {
-    addresses: {},
     fileSize: 1,
     uploading: false,
     uploadProgress: 0
@@ -24,13 +25,15 @@ class UploadContacts extends Component {
     // const uploadedContacts = JSON.parse(
     //   localStorage.getItem('uploadedContacts')
     // )
-    const { updateContactsList } = this.props
-    updateContactsList({ allIds: [], byId: {} })
+    const { updateContactsList, setAllAddresses } = this.props
+    const initialState = { allIds: [], byId: {} }
+    updateContactsList(initialState)
+    setAllAddresses(initialState)
   }
 
   uploadContacts = async () => {
     const { addresses } = this.state
-    const { contacts, navigate } = this.props
+    const { contacts, setAllAddresses, navigate } = this.props
 
     this.setState(prevState => ({
       ...prevState,
@@ -60,9 +63,10 @@ class UploadContacts extends Component {
 
     localStorage.removeItem('uploadedContacts')
 
+    setAllAddresses({ allIds: [], byId: {} })
+
     this.setState(
       {
-        addresses: {},
         uploadProgress: 0,
         fileSize: 1,
         uploading: false
@@ -90,7 +94,7 @@ class UploadContacts extends Component {
   }
 
   onUploadComplete = (contacts, addresses) => {
-    const { updateContactsList } = this.props
+    const { updateContactsList, setAllAddresses } = this.props
     // TODO: save uploaded Contacts in localStorage
     // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
     const uploadedContacts = contacts.reduce(
@@ -115,9 +119,9 @@ class UploadContacts extends Component {
     )
 
     updateContactsList(uploadedContacts)
+    setAllAddresses({ allIds: Object.keys(addresses), byId: addresses })
 
     this.setState({
-      addresses,
       uploadProgress: 0,
       fileSize: 1,
       uploading: false
@@ -148,12 +152,8 @@ class UploadContacts extends Component {
   }
 
   updateContact = contact => {
-    const { contactsById } = this.props
-    const newContactMap = { ...contactsById, [contact.id]: contact }
-    this.setState(prevState => ({
-      ...prevState,
-      contactsById: newContactMap
-    }))
+    const { updateUploadedContact } = this.props
+    updateUploadedContact(contact)
   }
 
   render() {
@@ -199,7 +199,6 @@ class UploadContacts extends Component {
     }
 
     const { sortOrder, reverse, sortContactsBy } = this.props
-    const { addresses } = this.state
 
     const readyToUpload = contacts.every(con => !isContactInvalid(con))
 
@@ -222,7 +221,6 @@ class UploadContacts extends Component {
           </div>
           <ContactsList
             contacts={contacts}
-            addresses={addresses}
             sortOrder={sortOrder}
             reverse={reverse}
             updateContact={this.updateContact}
@@ -236,6 +234,7 @@ class UploadContacts extends Component {
 
 export default connect(
   state => ({
+    addresses: allAddresses(state),
     contacts: sortedContacts(state),
     contactsById: state.contacts.byId,
     sortOrder: state.tableSorter.sortOrder,
@@ -243,6 +242,8 @@ export default connect(
   }),
   {
     updateContactsList: setUserContacts,
+    updateUploadedContact,
+    setAllAddresses,
     sortContactsBy
   }
 )(UploadContacts)
