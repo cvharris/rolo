@@ -1,6 +1,7 @@
 import {
   ADD_ADDRESS,
   REMOVE_ADDRESS,
+  SET_ADDRESSES,
   UPDATE_ADDRESS
 } from '../config/constants'
 
@@ -11,25 +12,36 @@ export const initialState = {
 }
 
 // Reducer
-export default (state = initialState, { type, payload }) => {
-  switch (type) {
+export default (state = initialState, action) => {
+  switch (action.type) {
+    case SET_ADDRESSES:
+      return action.addressState
     case ADD_ADDRESS:
       return {
-        allIds: [...state.allIds, payload.id],
-        byId: { ...state.byId, [payload.id]: payload }
+        allIds: [...state.allIds, action.address.toHash()],
+        byId: { ...state.byId, [action.address.toHash()]: action.address }
       }
     case REMOVE_ADDRESS:
-      const { [payload]: deletedAddress, ...newState } = state.byId
+      const {
+        [action.address.toHash()]: deletedAddress,
+        ...newState
+      } = state.byId
       return {
-        allIds: state.allIds.filter(addressId => addressId !== payload),
+        allIds: state.allIds.filter(
+          addressId => addressId !== action.address.toHash()
+        ),
         byId: newState
       }
     case UPDATE_ADDRESS:
       return {
         ...state,
-        byId: { ...state.byId, [payload.id]: payload }
+        byId: { ...state.byId, [action.address.toHash()]: action.address }
       }
     default:
       return state
   }
 }
+
+// Getters
+export const allAddresses = state =>
+  state.addresses.allIds.map(addressId => state.addresses.byId[addressId])

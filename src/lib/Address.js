@@ -1,13 +1,7 @@
 import md5 from 'crypto-js/md5'
 
 export default class Address {
-  constructor({
-    street1 = '',
-    street2 = '',
-    city = '',
-    state = '',
-    zip = '00000'
-  }) {
+  constructor({ street1 = '', street2 = '', city = '', state = '', zip = '' }) {
     this.street1 = street1
     this.street2 = street2
     this.city = city
@@ -19,6 +13,21 @@ export default class Address {
     return md5(
       `${this.street1}${this.street2}${this.city}${this.state}${this.zip}`
     ).toString()
+  }
+
+  toString() {
+    if (
+      !this.street1 &&
+      !this.street2 &&
+      !this.city &&
+      !this.state &&
+      !this.zip
+    ) {
+      return ''
+    }
+    return `${this.street1}${this.street2 ? `, ${this.street2}` : ''}, ${
+      this.city
+    }, ${this.state} ${this.zip}`
   }
 
   toObject() {

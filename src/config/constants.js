@@ -6,6 +6,7 @@ export const REMOVE_CONTACT = 'REMOVE_CONTACT'
 export const UPDATE_CONTACT = 'UPDATE_CONTACT'
 export const UPLOAD_CONTACTS = 'UPLOAD_CONTACTS'
 export const MERGE_CONTACTS = 'MERGE_CONTACTS'
+export const SET_FROM_STATE = 'SET_FROM_STATE'
 
 // ContactsTableSorter
 export const SORT_TABLE = 'SORT_TABLE'
@@ -22,6 +23,7 @@ export const REMOVE_FAMILY = 'REMOVE_FAMILY'
 export const UPDATE_FAMILY = 'UPDATE_FAMILY'
 
 // Addresses
+export const SET_ADDRESSES = 'SET_ADDRESSES'
 export const ADD_ADDRESS = 'ADD_ADDRESS'
 export const DEACTIVATE_ADDRESS = 'DEACTIVATE_ADDRESS'
 export const REMOVE_ADDRESS = 'REMOVE_ADDRESS'
