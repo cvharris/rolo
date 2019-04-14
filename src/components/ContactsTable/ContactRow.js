@@ -89,6 +89,10 @@ const ContactRow = ({
         )}
       </ContactCellText>
       <ContactCellText
+        field={contact.prefix}
+        onFieldChange={val => updateContact('prefix', val)}
+      />
+      <ContactCellText
         field={contact.suffix}
         onFieldChange={val => updateContact('suffix', val)}
       />
@@ -133,7 +137,9 @@ const ContactRow = ({
       </ContactCellTimestamp>
       <ContactCellAddress
         field={
-          contact.address ? addressesById[contact.address] : new Address({})
+          contact.address && addressesById[contact.address.id]
+            ? addressesById[contact.address.id]
+            : new Address({})
         }
         onFieldChange={val => updateContact('address', val)}
         options={addresses}

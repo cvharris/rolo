@@ -4,6 +4,7 @@ export default {
   middleName: 'Middle Name',
   maidenName: 'Maiden Name',
   lastName: 'Last Name',
+  prefix: 'Prefix',
   suffix: 'Suffix',
   gender: 'M/F',
   phoneNumber: 'Phone Number',
