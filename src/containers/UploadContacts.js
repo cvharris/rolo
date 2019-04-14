@@ -4,7 +4,7 @@ import { sortContactsBy } from 'actions/contactsTableSorterActions'
 import ContactsList from 'components/ContactsTable/ContactsList'
 import HowItWorks from 'components/HowItWorks'
 import UploadInstructions from 'components/UploadInstructions'
-import { db } from 'config/firebase'
+import firebase, { db } from 'config/firebase'
 import Contact from 'lib/Contact'
 import isContactInvalid from 'lib/isContactInvalid'
 import parseUploadedContacts from 'lib/parseUploadedContacts'
@@ -21,19 +21,29 @@ class UploadContacts extends Component {
   }
 
   componentDidMount() {
-    // TODO: store uploaded contacts in localstorage until after upload
+    const { updateContactsList, setAllAddresses } = this.props
+
+    // restore uploaded contacts from localstorage after upload
+    const initialState = { allIds: [], byId: {} }
     // const uploadedContacts = JSON.parse(
     //   localStorage.getItem('uploadedContacts')
     // )
-    const { updateContactsList, setAllAddresses } = this.props
-    const initialState = { allIds: [], byId: {} }
+    // if (uploadedContacts) {
+    //   updateContactsList(uploadedContacts)
+    // } else {
     updateContactsList(initialState)
+    // }
     setAllAddresses(initialState)
   }
 
   uploadContacts = async () => {
-    const { addresses } = this.state
-    const { contacts, setAllAddresses, navigate } = this.props
+    const {
+      contacts,
+      setAllAddresses,
+      navigate,
+      addresses,
+      updateContactsList
+    } = this.props
 
     this.setState(prevState => ({
       ...prevState,
@@ -45,17 +55,17 @@ class UploadContacts extends Component {
 
     // Create Contacts
     contacts.forEach(contact => {
-      updateAll.set(
-        db.collection('contacts').doc(contact.id),
-        contact.toObject()
-      )
+      updateAll.set(db.collection('contacts').doc(contact.id), {
+        ...contact.toObject(),
+        uploadedBy: db.collection('users').doc(firebase.auth().currentUser.uid)
+      })
     })
 
     // Create Addresses
-    Object.keys(addresses).forEach(addressHash => {
+    addresses.forEach(address => {
       updateAll.set(
-        db.collection('addresses').doc(addressHash),
-        addresses[addressHash.toObject()]
+        db.collection('addresses').doc(address.toHash()),
+        address.toObject()
       )
     })
 
@@ -63,6 +73,7 @@ class UploadContacts extends Component {
 
     localStorage.removeItem('uploadedContacts')
 
+    updateContactsList({ allIds: [], byId: {}, fromState: '' })
     setAllAddresses({ allIds: [], byId: {} })
 
     this.setState(
@@ -95,8 +106,7 @@ class UploadContacts extends Component {
 
   onUploadComplete = (contacts, addresses) => {
     const { updateContactsList, setAllAddresses } = this.props
-    // TODO: save uploaded Contacts in localStorage
-    // localStorage.setItem('uploadedContacts', JSON.stringify(mappedContacts))
+    // TODO: This function creates contacts from uploaded data, use undefined instead of null
     const uploadedContacts = contacts.reduce(
       (state, contact, i, arr) => {
         const mappedContact = new Contact({
@@ -109,6 +119,9 @@ class UploadContacts extends Component {
           ),
           spouse: contact.spouse
             ? this.mapClientIdToFirebaseId(contact.spouse, arr)
+            : null,
+          address: contact.address
+            ? db.doc(`addresses/${contact.address}`)
             : null
         })
         state.byId[mappedContact.id] = mappedContact
@@ -117,6 +130,9 @@ class UploadContacts extends Component {
       },
       { allIds: [], byId: {} }
     )
+
+    // save uploaded Contacts in localStorage
+    // localStorage.setItem('uploadedContacts', JSON.stringify(uploadedContacts))
 
     updateContactsList(uploadedContacts)
     setAllAddresses({ allIds: Object.keys(addresses), byId: addresses })

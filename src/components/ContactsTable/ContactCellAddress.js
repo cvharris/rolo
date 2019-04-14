@@ -1,9 +1,9 @@
-import Address from 'lib/Address'
-import addressParser from 'parse-address'
-import PropTypes from 'prop-types'
-import React from 'react'
-import Select from 'react-select/lib/Creatable'
-import ContactCell from './ContactCell'
+import Address from 'lib/Address';
+import addressParser from 'parse-address';
+import PropTypes from 'prop-types';
+import React from 'react';
+import Select from 'react-select/lib/Creatable';
+import ContactCell from './ContactCell';
 
 class ContactCellAddress extends ContactCell {
   saveEditedValue = option => {
@@ -88,7 +88,7 @@ class ContactCellAddress extends ContactCell {
 }
 
 ContactCellAddress.propTypes = {
-  field: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+  field: PropTypes.instanceOf(Address).isRequired,
   options: PropTypes.array.isRequired,
   onFieldChange: PropTypes.func.isRequired
 }
