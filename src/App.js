@@ -1,7 +1,10 @@
+import { Router } from '@reach/router'
+import Homepage from 'containers/Homepage'
 import React, { Component } from 'react'
 import LoadingScreen from './components/LoadingScreen'
 import firebase from './config/firebase'
 import Login from './containers/Login'
+import PrivacyPolicy from './containers/PrivacyPolicy'
 import Rolodex from './containers/Rolodex'
 
 export default class RoloApp extends Component {
@@ -43,7 +46,13 @@ export default class RoloApp extends Component {
     }
 
     if (!isAuthenticated) {
-      return <Login handleLogin={this.handleUserLogin} />
+      return (
+        <Router>
+          <Homepage path="/" />
+          <Login path="login" handleLogin={this.handleUserLogin} />
+          <PrivacyPolicy path="privacy-policy" />
+        </Router>
+      )
     }
 
     return <Rolodex handleLogout={this.handleUserLogout} />

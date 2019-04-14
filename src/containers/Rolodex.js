@@ -16,7 +16,6 @@ import { connect } from 'react-redux'
 import AddContact from './AddContact'
 import AllContacts from './AllContacts'
 import EditContact from './EditContact'
-import PrivacyPolicy from './PrivacyPolicy'
 import Sidebar from './Sidebar'
 import UploadContacts from './UploadContacts'
 
@@ -117,7 +116,6 @@ class Rolodex extends Component {
             <AddContact path="new-contact" />
             <EditContact path="edit-contact/:contactId" />
             <UploadContacts path="upload-contacts" />
-            <PrivacyPolicy path="privacy-policy" />
           </Router>
         </div>
       </div>
