@@ -16,7 +16,7 @@ import configureStore from 'config/store'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import 'styles/index.scss'
+import 'styles/main.scss'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
